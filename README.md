@@ -7,14 +7,11 @@ The Vehicle Simulation Environment (VSE) library consists of classes
 designed to aid in building and propagating vehicle models. A model is
 typically a system of differential equations and propagation generally
 means integrating this system over time. The library also contains
-utilities to display the model state in a Java3D environment (multiple
-models can be loaded at once).
+utilities to display the model states in a Java3D environment.
 
-Most of the library package names are a tip of the hat to a powerful
-modeling and simulation language developed by many people I have a great
-deal of respect for.  Also, we all know deciding on names is the hardest
-part of writing code - why not stick with conventions that are more than
-50 years old.
+Many of the library package names were chosen as a tip of the hat to
+a powerful modeling and simulation language that has been in use for
+more than 50 years.
 
 c0ntm - Control Modeling
 ```
