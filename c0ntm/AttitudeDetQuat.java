@@ -161,8 +161,8 @@ public class AttitudeDetQuat {
             // Actual Measurement
           sensors[jj].getPointing(kk, uv);
             // Computed measurement, y
-          qAtt.frameRot(xyz, ycb);
-          qb2s.frameRot(ycb, ycs);
+          ycb.fRot(qAtt, xyz);
+          ycs.fRot(qb2s, ycb);
           yc.set(ycs, 1);
             // Residual 
           r.minus(uv, yc);

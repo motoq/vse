@@ -227,8 +227,8 @@ public class AttitudeControlDCM {
   public Tuple3D getU(Quaternion currentAtt, Quaternion desiredAtt,
                                              Tuple3D wvec, Tuple3D uvec) {
       // Simply convert current and desired attitudes to DCMs, then pass along.
-    currentAtt.rotMat(cntQC.currentAtt);
-    desiredAtt.rotMat(cntQC.desiredAtt);
+    cntQC.currentAtt.set(currentAtt);
+    cntQC.desiredAtt.set(desiredAtt);
     getU(cntQC.currentAtt, cntQC.desiredAtt, wvec, uvec);
 
     return uvec;
@@ -249,7 +249,7 @@ public class AttitudeControlDCM {
   public Tuple3D getU(Quaternion currentAtt, Matrix3X3 desiredAtt,
                                              Tuple3D wvec, Tuple3D uvec) {
       // Simply convert current and desired attitudes to DCMs, then pass along.
-    currentAtt.rotMat(cntQC.currentAtt);
+    cntQC.currentAtt.set(currentAtt);
     getU(cntQC.currentAtt, desiredAtt, wvec, uvec);
 
     return uvec;

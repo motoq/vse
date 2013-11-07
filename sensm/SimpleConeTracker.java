@@ -134,7 +134,7 @@ public class SimpleConeTracker implements IPointingObsModeled {
       r_t_b_s.put(Basis3D.J, y);
         // Always positive Z
       r_t_b_s.put(Basis3D.K, Math.sqrt(1 - x*x - y*y));
-      qAtt.vecRot(r_t_b_s, r_t_b_i[ii]);
+      r_t_b_i[ii].vRot(qAtt, r_t_b_s);
         // Done with reference vector - unitize just in case...
       r_t_b_i[ii].unitize();
 
@@ -150,7 +150,7 @@ public class SimpleConeTracker implements IPointingObsModeled {
           r_t_b_s.unitize();
         }
       }
-      body2Sensor.vecRot(r_t_b_s, doa[ii]);
+      doa[ii].vRot(body2Sensor, r_t_b_s);
       uv[ii].set(r_t_b_s);
     }
   } //ESCA

@@ -112,7 +112,7 @@ public class Simple6DOFdq implements IDiffQ {
      * inertial one.
      */
     eomC.x_6dq.getAttitude(t, eomC.i2bQ);
-    eomC.i2bQ.vecRot(iC.bodyForceCG, eomC.forceBI);
+    eomC.forceBI.vRot(eomC.i2bQ, iC.bodyForceCG);
       // total force through cg!  
     iC.inertialForceCG.plus(eomC.forceBI);
 

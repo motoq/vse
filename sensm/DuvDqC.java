@@ -73,7 +73,7 @@ public class DuvDqC extends Matrix {
    */
   public Matrix partials(Tuple3D xyz, Quaternion qbs, Quaternion q) {
       // Partial of sensor reference frame to body reference frame
-    qbs.rotMat(body2Sensor);
+    body2Sensor.set(qbs);
     dpdb.put(1, 1, body2Sensor.get(1,1));
     dpdb.put(1, 2, body2Sensor.get(1,2));
     dpdb.put(1, 3, body2Sensor.get(1,3));

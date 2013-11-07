@@ -322,7 +322,7 @@ public class ReferencePointSys implements ISysEqns, IPosition {
         // to inertial
       pointOfOrigin.getPosition(tloc, origin);
       time = pointOfOrigin.getAttitude(tloc, originAtt);
-      originAtt.vecRot(relativePosition, inertialFromOrigin);
+      inertialFromOrigin.vRot(originAtt, relativePosition);
       pout.plus(origin, inertialFromOrigin);
     } else {
       pout.set(relativePosition);

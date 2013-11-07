@@ -22,6 +22,7 @@
 package com.motekew.vse.math;
 
 import com.motekew.vse.enums.Basis3D;
+import com.motekew.vse.enums.Q;
 
 /**
  * <code>Tuple3D</code> is a <code>Tuple</code> representing
@@ -263,6 +264,88 @@ public class Tuple3D extends Tuple {
     vals[2] = aptr[0]*bptr[1] - aptr[1]*bptr[0];
 
     return this;
+  }
+
+  /**
+   * qvq*   (quaternion multiplication performed left to right)
+   *
+   * Uses the input unit quaternion to perform a point rotation on the
+   * input <code>Tuple3D</code>.
+   *
+   * @param   q   Unit quaternion
+   * @param   r   Vector to be rotated
+   */
+  public void vRot(Quaternion q, Tuple3D r) {
+    double q0 = q.get(Q.Q0);
+    double qi = q.get(Q.QI);
+    double qj = q.get(Q.QJ);
+    double qk = q.get(Q.QK);
+      //
+    double q0q0 = q0*q0;
+    double q0qi = q0*qi;
+    double q0qj = q0*qj;
+    double q0qk = q0*qk;
+    double qiqj = qi*qj;
+    double qiqk = qi*qk;
+    double qjqk = qj*qk;
+      //
+    double q11 = 2.0*(q0q0 + qi*qi) - 1.0;
+    double q21 = 2.0*(qiqj + q0qk);
+    double q31 = 2.0*(qiqk - q0qj);
+    double q12 = 2.0*(qiqj - q0qk);
+    double q22 = 2.0*(q0q0 + qj*qj) - 1.0;
+    double q32 = 2.0*(qjqk + q0qi);
+    double q13 = 2.0*(qiqk + q0qj);
+    double q23 = 2.0*(qjqk - q0qi);
+    double q33 = 2.0*(q0q0 + qk*qk) - 1.0;
+      //
+    double[] ivals = r.valuesPtr();            
+    double[] ovals = this.valuesPtr();
+
+    ovals[0] = q11*ivals[0] + q12*ivals[1] + q13*ivals[2];
+    ovals[1] = q21*ivals[0] + q22*ivals[1] + q23*ivals[2];
+    ovals[2] = q31*ivals[0] + q32*ivals[1] + q33*ivals[2];
+  }
+
+  /**
+   * q*vq   (quaternion multiplication performed left to right)
+   *
+   * Uses the input unit quaternion to perform a reference frame rotation on
+   * the input <code>Tuple3D</code>.
+   *
+   * @param   q   Unit quaternion
+   * @param   r   Vector to be subjected to a reference frame transformation.
+   */
+  public void fRot(Quaternion q, Tuple3D r) {
+    double q0 = q.get(Q.Q0);
+    double qi = q.get(Q.QI);
+    double qj = q.get(Q.QJ);
+    double qk = q.get(Q.QK);
+      //
+    double q0q0 = q0*q0;
+    double q0qi = q0*qi;
+    double q0qj = q0*qj;
+    double q0qk = q0*qk;
+    double qiqj = qi*qj;
+    double qiqk = qi*qk;
+    double qjqk = qj*qk;
+      //
+    double q11 = 2.0*(q0q0 + qi*qi) - 1.0;
+    double q21 = 2.0*(qiqj + q0qk);
+    double q31 = 2.0*(qiqk - q0qj);
+    double q12 = 2.0*(qiqj - q0qk);
+    double q22 = 2.0*(q0q0 + qj*qj) - 1.0;
+    double q32 = 2.0*(qjqk + q0qi);
+    double q13 = 2.0*(qiqk + q0qj);
+    double q23 = 2.0*(qjqk - q0qi);
+    double q33 = 2.0*(q0q0 + qk*qk) - 1.0;
+      //
+    double[] ivals = r.valuesPtr();            
+    double[] ovals = this.valuesPtr();
+
+    ovals[0] = q11*ivals[0] + q21*ivals[1] + q31*ivals[2];
+    ovals[1] = q12*ivals[0] + q22*ivals[1] + q32*ivals[2];
+    ovals[2] = q13*ivals[0] + q23*ivals[1] + q33*ivals[2];
   }
 
   /**

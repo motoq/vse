@@ -61,11 +61,6 @@ public class Quaternion {
   private double qj = 0;
   private double qk = 0;
 
-    // see updateQ
-  private double q11, q12, q13;
-  private double q21, q22, q23;
-  private double q31, q32, q33;
-
   /**
    * Default contstructor
    */
@@ -497,74 +492,6 @@ public class Quaternion {
   }
 
   /**
-   *      qvq*
-   * 
-   * Uses this quaternion to perform a point rotation on the
-   * entered <code>Tuple3D</code>.  It is important that this quaternion
-   * be a unit quaternion for this to be a pure rotation about the
-   * quaternion axis.  tout = qvq* = Qv, where v is the intput vector,
-   * q is this quaternion, and q* is the complex conjugate of this
-   * quaternion vector.
-   *
-   * @param   tin     Tuple to be rotated
-   * @param   tout    Rotated tuple
-   */
-  public void vecRot(Tuple3D tin, Tuple3D tout) {
-    double[] ivals = tin.valuesPtr();
-    double[] ovals = tout.valuesPtr();
-
-    updateQ();
-    ovals[0] = q11*ivals[0] + q12*ivals[1] + q13*ivals[2];
-    ovals[1] = q21*ivals[0] + q22*ivals[1] + q23*ivals[2];
-    ovals[2] = q31*ivals[0] + q32*ivals[1] + q33*ivals[2];
-  }
-
-  /**
-   *      q*vq
-   * 
-   * Uses this quaternion to perform a reference frame rotation for the
-   * entered <code>Tuple3D</code>.  It is important that this quaternion
-   * be a unit quaternion for this to be a pure rotation about the
-   * quaternion axis.  tout = q*vq = QTv, where v is the intput vector,
-   * q is this quaternion, and q* is the complex conjugate of this
-   * quaternion.  QT is the transpose of the Q matrix.
-   *
-   * @param   tin     Tuple to be rotated
-   * @param   tout    Rotated tuple
-   */
-  public void frameRot(Tuple3D tin, Tuple3D tout) {
-    double[] ivals = tin.valuesPtr();
-    double[] ovals = tout.valuesPtr();
-
-    updateQ();
-    ovals[0] = q11*ivals[0] + q21*ivals[1] + q31*ivals[2];
-    ovals[1] = q12*ivals[0] + q22*ivals[1] + q32*ivals[2];
-    ovals[2] = q13*ivals[0] + q23*ivals[1] + q33*ivals[2];
-  }
-
-  /**
-   * Set input matrix to be the equivalent rotation matrix.
-   * The multiple of this matrix by a vector results in a
-   * reference frame transformation.
-   *
-   * @param   rout    O:  Equivalent rotation matrix.
-   */
-  public void rotMat(Matrix3X3 rout) {
-    updateQ();
-      // Remember, Q is a vector rotation, not a frame rotation,
-      // so use the transpose.
-    rout.put(I, I, q11);
-    rout.put(J, I, q12);
-    rout.put(K, I, q13);
-    rout.put(I, J, q21);
-    rout.put(J, J, q22);
-    rout.put(K, J, q23);
-    rout.put(I, K, q31);
-    rout.put(J, K, q32);
-    rout.put(K, K, q33);
-  }
-
-  /**
    * @return            Rotation angle about axis, radians.
    */
   public double angle() {
@@ -606,6 +533,15 @@ public class Quaternion {
   }
 
   /**
+   * Prints the components of this <code>Quaternion</code>
+   */
+  public String toString() {
+    return("q0:  " + q0 + "  q:  " + qi + " " + qj + " " + qk); 
+  }
+}
+
+
+  /*
    * Calculates the matrix Q, which is multiplied by a vector
    * giving the equivalent of the quaternion rotation operation
    * qvq*, where v is the vector rotated within a reference frame,
@@ -614,6 +550,7 @@ public class Quaternion {
    * instead of a vector rotation, can be accomplished by rotating
    * the vector by the transpose of the Q matrix.
    */
+  /*
   private void updateQ() {
     double q0q0 = q0*q0;
     double q0qi = q0*qi;
@@ -633,11 +570,4 @@ public class Quaternion {
     q23 = 2.0*(qjqk - q0qi);
     q33 = 2.0*(q0q0  + qk*qk) - 1.0;
   }
-
-  /**
-   * Prints the components of this <code>Quaternion</code>
-   */
-  public String toString() {
-    return("q0:  " + q0 + "  q:  " + qi + " " + qj + " " + qk); 
-  }
-}
+  */

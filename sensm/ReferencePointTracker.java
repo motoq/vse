@@ -130,7 +130,7 @@ public class ReferencePointTracker implements IPointingObsModeled {
     tracked.getPosition(time, r_t_o_i);
  
     r_t_b_i.minus(r_t_o_i, r_b_o_i);
-    qi2b.frameRot(r_t_b_i, r_t_b_b);
+    r_t_b_b.fRot(qi2b, r_t_b_i);
     r_t_b_b.unitize();
       // Add random error to output pointing vector components.
       // If these two components now have a magnitude > 1, it

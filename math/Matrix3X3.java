@@ -22,6 +22,7 @@
 package com.motekew.vse.math;
 
 import com.motekew.vse.enums.Basis3D;
+import com.motekew.vse.enums.Q;
 
 /**
  * <code>Matrix3X3</code> is a <code>Matrix</code> representing
@@ -128,6 +129,40 @@ public class Matrix3X3 extends Matrix {
     vals[2][0] = inptr[2][0];
     vals[2][1] = inptr[2][1];
     vals[2][2] = inptr[2][2];
+  }
+
+  /**
+   * Sets this matrix to the equivalent quaternion reference
+   * frame rotation transformation (vs. a vector rotation).
+   *
+   * @param   q   Quaternion to convert to a Matrix reference
+   *              frame transformation.
+   */
+  public void set(Quaternion q) {
+    double q0 = q.get(Q.Q0);
+    double qi = q.get(Q.QI);
+    double qj = q.get(Q.QJ);
+    double qk = q.get(Q.QK);
+      //
+    double q0q0 = q0*q0;  
+    double q0qi = q0*qi;
+    double q0qj = q0*qj;
+    double q0qk = q0*qk;
+    double qiqj = qi*qj;
+    double qiqk = qi*qk;
+    double qjqk = qj*qk;
+
+    vals[0][0] = 2.0*(q0q0 + qi*qi) - 1.0;
+    vals[0][1] = 2.0*(qiqj + q0qk);
+    vals[0][2] = 2.0*(qiqk - q0qj);
+      //
+    vals[1][0] = 2.0*(qiqj - q0qk);
+    vals[1][1] = 2.0*(q0q0 + qj*qj) - 1.0;
+    vals[1][2] = 2.0*(qjqk + q0qi);
+      //
+    vals[2][0] = 2.0*(qiqk + q0qj);
+    vals[2][1] = 2.0*(qjqk - q0qi);
+    vals[2][2] = 2.0*(q0q0 + qk*qk) - 1.0;
   }
 
   /**

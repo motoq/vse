@@ -139,8 +139,8 @@ public class AttitudeDetDQuat {
         for (int kk=0; kk<nMeas; kk++) {
           // Known/modeled location
           sensors[jj].getReferencePointing(kk, xyz);
-          qAtt.frameRot(xyz, xyz_b);
-          qb2s.frameRot(xyz_b, xyz_s);
+          xyz_b.fRot(qAtt, xyz);
+          xyz_s.fRot(qb2s, xyz_b);
           sensors[jj].getPointing(kk, uv);
             // True vs. computed measurement:  residual
           uvc.set(xyz_s, 1);

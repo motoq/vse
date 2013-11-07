@@ -323,8 +323,8 @@ public class KeplerianOE extends Tuple {
     k2cC.q12.mult(k2cC.q, k2cC.q2);
     k2cC.q2.set(-get(O), khat);
     k2cC.q.mult(k2cC.q12, k2cC.q2);
-    k2cC.q.frameRot(k2cC.r_pqw, r);
-    k2cC.q.frameRot(k2cC.v_pqw, v);
+    r.fRot(k2cC.q, k2cC.r_pqw);
+    v.fRot(k2cC.q, k2cC.v_pqw);
   }
 
     //  getRV() Cache - Keplerian to pos & vel vectors

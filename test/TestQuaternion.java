@@ -32,7 +32,7 @@ public class TestQuaternion {
     Quaternion quat = new Quaternion();
     quat.set(dcm);
     System.out.println("Quaternion:  " + quat);
-    quat.frameRot(r1, r2);
+    r2.fRot(quat, r1);
     System.out.println("r2 with quat rot:  " + r2);
     
     Tuple3D xaxis = new Tuple3D(1.0, 0.0, 0.0);
@@ -43,7 +43,7 @@ public class TestQuaternion {
     qz.set(alpha, zaxis);
     quat.mult(qz, qx);
     System.out.println("Quaternion:  " + quat);
-    quat.frameRot(r1, r2);
+    r2.fRot(quat, r1);
     System.out.println("r2 with quat quat rot:  " + r2);
 
   }
