@@ -133,7 +133,7 @@ public class AttitudeDetQuat {
       // extra noisy.
     attInit.estimateAtt(sensors, qAtt);
     qAtt.standardize();
-    qAtt.mget(1, phat);
+    phat.set(1, qAtt);
     int nMeas;
     for (nitr=1; nitr<maxitr; nitr++) {
       ss.reset();

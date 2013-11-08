@@ -135,30 +135,6 @@ public class Tuple3D extends Tuple {
   }
 
   /**
-   * Sets three subsequent values of the input <code>Tuple</code> starting with
-   * the input index value, to be the values in this Tuple3D.  If the input Tuple
-   * isn't long enough, a VectorSpaceIndexOutOfBoundsException will be thrown.
-   * 
-   * @param    Start index from where to begin putting elements.
-   * @param    <code>Tuple</code> into which elements are to be copied.
-   * 
-   * @throws   Thrown if the input <code>Tuple</code> can't be accessed at the
-   *           supplied, and two subsequent indices.
-   */
-  public void mget(int ndx, Tuple tout) {
-    int ndxend = ndx + 2;
-    
-    if (tout.N < ndxend) {
-      throw new VectorSpaceIndexOutOfBoundsException(
-          "Tuple: index out of bounds:  (" + ndxend + ")");
-    } else {
-      tout.put(ndx, get(1));
-      tout.put(ndx+1, get(2));
-      tout.put(ndxend, get(3));
-    }
-  }
-
-  /**
    * Gets the value of the Tuple3D given a <code>Basis3D</code>
    * enum index.
    *

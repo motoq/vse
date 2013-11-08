@@ -23,6 +23,8 @@ package com.motekew.vse.math;
 
 import java.util.Arrays;
 
+import com.motekew.vse.enums.Q;
+
 /**
  * <code>Tuple</code> is a <code>VectorSpace</code> representing
  * a M-tuple.  Any attempt to access an element of this M-tuple
@@ -160,6 +162,56 @@ public class Tuple extends VectorSpace {
      throw new VectorSpaceArgumentException("Tuple must be set " +
                    "with a Tuple of " + N + " elements, not:  " + tup.N);
     }
+  }
+
+  /**
+   * Starting with the ndx'th element, sets three values of this Tuple to
+   * those of the input 3-tuple.
+   *
+   * @param   ndx   Start index from where to begin putting elements.
+   *                The first element is '1'.
+   * @param   tup3  3-tuple from which to copy values.
+   *
+   * @throws        If the input 3-tuple won't fit into this tuple given
+   *                the requested offset (ndx).
+   */
+  public void set(int ndx, Tuple3D tup3) {
+    int ndxend = ndx + 2;
+
+    if (N < ndxend) {
+      throw new VectorSpaceIndexOutOfBoundsException(
+          "Tuple: index out of bounds:  (" + ndxend + ")");
+    } else {
+      vals[ndx-1] = tup3.get(1);
+      vals[ndx]   = tup3.get(2);
+      vals[ndx+1] = tup3.get(3);
+    }  
+  }
+
+  /**
+   * Starting with the ndx'th element, sets four values of this Tuple to
+   * those of the input Quaternion, with the 1st element being the
+   * Quaternion scalar.
+   *
+   * @param   ndx   Start index from where to begin putting elements.
+   *                The first element is '1'.
+   * @param   tup3  Quaternion from which to copy values.
+   *
+   * @throws        If the input Quaternion won't fit into this tuple given
+   *                the requested offset (ndx).
+   */
+  public void set(int ndx, Quaternion quat) {
+    int ndxend = ndx + 3;
+
+    if (N < ndxend) {
+      throw new VectorSpaceIndexOutOfBoundsException(
+          "Tuple: index out of bounds:  (" + ndxend + ")");
+    } else {
+      vals[ndx-1] = quat.get(Q.Q0);
+      vals[ndx]   = quat.get(Q.QI);
+      vals[ndx+1] = quat.get(Q.QJ);
+      vals[ndx+2] = quat.get(Q.QK);
+    }  
   }
 
   /**

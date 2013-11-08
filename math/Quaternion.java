@@ -259,32 +259,6 @@ public class Quaternion {
       throw new SingularQuaternionException("Can't extract Quaternion" +
                                             " from DCM");
     }
-  }
-
-  /**
-   * Sets four subsequent values of the input <code>Tuple</code> starting with
-   * the input index value, to be the values in this Quaternion (q0 being the
-   * first element, and qk the last).  If the input Tuple isn't long enough, a
-   * VectorSpaceIndexOutOfBoundsException will be thrown.
-   * 
-   * @param    Start index from where to begin putting elements.
-   * @param    <code>Tuple</code> into which elements are to be copied.
-   * 
-   * @throws   Thrown if the input <code>Tuple</code> can't be accessed at the
-   *           supplied, and three subsequent indices.
-   */
-  public void mget(int ndx, Tuple tout) {
-    int ndxend = ndx + 3;
-    
-    if (tout.N < ndxend) {
-      throw new VectorSpaceIndexOutOfBoundsException(
-          "Tuple: index out of bounds:  (" + ndxend + ")");
-    } else {
-      tout.put(ndx,    q0);
-      tout.put(ndx+1,  qi);
-      tout.put(ndx+2,  qj);
-      tout.put(ndxend, qk);
-    }
   } 
 
   /**
