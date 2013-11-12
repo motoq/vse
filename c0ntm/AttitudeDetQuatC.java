@@ -21,6 +21,7 @@
 
 package com.motekew.vse.c0ntm;
 
+import com.motekew.vse.enums.IGetQ;
 import com.motekew.vse.enums.Q;
 import com.motekew.vse.math.*;
 import com.motekew.vse.sensm.*;
@@ -28,7 +29,8 @@ import com.motekew.vse.sensm.*;
 /**
  * This class handles attitude determination given unit pointing vectors
  * to known reference points and pointing vectors measured from sensors.
- * It requires at least two measurements to work.
+ * It requires at least two measurements to work.  The estimated attitude
+ * is accessed via the <code>IGetQ</code> interface
  * <P>
  * A very simple WLS solution is implemented.  The measurement errors
  * between each set are considered independent from each other.  Similarly,
@@ -44,8 +46,9 @@ import com.motekew.vse.sensm.*;
  *
  * @author   Kurt Motekew
  * @since    20130921
+ * @since    20131109  modified to use IGetQ interface
  */
-public class AttitudeDetQuatC {
+public class AttitudeDetQuatC implements IGetQ {
   public static final int NY = 2;        // Number of measurements per set    
   public static final int NP = 3;        // Number of solve for parameters
 
@@ -53,6 +56,7 @@ public class AttitudeDetQuatC {
   private double tol = .000005;          // Note tolerance can be smaller than
                                          // AttitudeDetQuat
 
+  private Quaternion qAtt = new Quaternion();
   private AttitudeDetTRIAD attInit = new AttitudeDetTRIAD();
   private SysSolverBD ss = new SysSolverBD(NY, NP);
   private Matrix qCov;
@@ -66,6 +70,19 @@ public class AttitudeDetQuatC {
   }
 
   /**
+   * Gets the component values the solved for attitude quaternion.
+   *
+   * @param  ndx   A <code>Q<code> indicating which component to
+   *               retrieve.
+   *
+   * @return      The double value representing the requested component
+   */
+  @Override
+  public double get(Q ndx) {
+    return qAtt.get(ndx);
+  }
+
+  /**
    * Estimates attitude of a body given pointing vectors supplied by
    * sensors and the modeled/known pointing vectors in the inertial/
    * computational reference frame.  The pointing vector is in the
@@ -75,8 +92,6 @@ public class AttitudeDetQuatC {
    *
    * @param    sensors    Measurements and known/modeled reference point
    *                      supplier
-   * @param    qAtt       Output quaternion representing a frame rotation
-   *                      from the sensor to known reference frame.
    *
    * @return              Number of iterations to reach convergence.
    *                      If less than zero, convergence, as determined by
@@ -84,7 +99,7 @@ public class AttitudeDetQuatC {
    *                      returned if less than two measurements were
    *                      passed in.
    */ 
-  public int estimateAtt(IPointingObsModeled[] sensors, Quaternion qAtt) {
+  public int estimateAtt(IPointingObsModeled[] sensors) {
     int numSensors = sensors.length;
 
       // First check to see if enough measurements are present
@@ -122,7 +137,8 @@ public class AttitudeDetQuatC {
     double qs, qi, qj, qk;
 
       // Use a deterministic method for the first guess
-    attInit.estimateAtt(sensors, qAtt);
+    attInit.estimateAtt(sensors);
+    qAtt.set(attInit);
     qAtt.standardize();
     phat.put(1, qAtt.get(Q.QI));
     phat.put(2, qAtt.get(Q.QJ));

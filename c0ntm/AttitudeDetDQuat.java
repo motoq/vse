@@ -1,7 +1,7 @@
 /*
  c  AttitudeDetDQuat.java
  c
- c  Copyright (C) 2012 Kurt Motekew
+ c  Copyright (C) 2012, 2013 Kurt Motekew
  c
  c  This library is free software; you can redistribute it and/or
  c  modify it under the terms of the GNU Lesser General Public   
@@ -28,7 +28,8 @@ import com.motekew.vse.sensm.*;
 /**
  * This class handles attitude determination given unit pointing vectors
  * to known reference points and pointing vectors measured from sensors.
- * It requires at least two measurements to work.
+ * It requires at least two measurements to work.  The estimated attitude
+ * is accessed via the <code>IGetQ</code> interface
  * <P>
  * It is based of a method presented in "A Gyro-Free Quaternion-Based
  * Attitude Determination System Suitable for Implementation Using Low
@@ -49,15 +50,30 @@ import com.motekew.vse.sensm.*;
  *
  * @author   Kurt Motekew
  * @since    20121011
+ * @since    20131109  modified to use IGetQ interface
  */
-public class AttitudeDetDQuat {
+public class AttitudeDetDQuat implements IGetQ {
   public static final int NY = 2;        // Number of measurements per set    
   public static final int NP = 3;        // Number of solve for parameters
 
   private int maxitr = 50;
   private double tol = .0005;
 
+  private Quaternion qAtt = new Quaternion();
   private AttitudeDetTRIAD attInit = new AttitudeDetTRIAD();
+
+  /**
+   * Gets the component values the solved for attitude quaternion.
+   *
+   * @param  ndx   A <code>Q<code> indicating which component to
+   *               retrieve.
+   *
+   * @return      The double value representing the requested component
+   */
+  @Override
+  public double get(Q ndx) {
+    return qAtt.get(ndx);
+  }
 
   /**
    * Estimates attitude of a body given pointing vectors supplied by
@@ -69,8 +85,6 @@ public class AttitudeDetDQuat {
    *
    * @param    sensors    Measurements and known/modeled reference point
    *                      supplier
-   * @param    qAtt       Output quaternion representing a frame rotation
-   *                      from the sensor to known reference frame.
    *
    * @return              Number of iterations to reach convergence.
    *                      If less than zero, convergence, as determined by
@@ -78,7 +92,7 @@ public class AttitudeDetDQuat {
    *                      returned if less than two measurements were
    *                      passed in.
    */ 
-  public int estimateAtt(IPointingObsModeled[] sensors, Quaternion qAtt) {
+  public int estimateAtt(IPointingObsModeled[] sensors) {
     int numSensors = sensors.length;
 
       // First check to see if enough measurements are present
@@ -114,7 +128,8 @@ public class AttitudeDetDQuat {
     Tuple2D sigmaUV = new Tuple2D();
     double sii, sjj, wii, wjj;
 
-    attInit.estimateAtt(sensors, qAtt);
+    attInit.estimateAtt(sensors);
+    qAtt.set(attInit);
     int nMeas;
     for (nitr=1; nitr<maxitr; nitr++) {
       ss.reset();

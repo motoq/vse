@@ -1,7 +1,7 @@
 /*
  c  AttitudeControlDCM.java
  c
- c  Copyright (C) 2011 Kurt Motekew
+ c  Copyright (C) 2011, 2013 Kurt Motekew
  c
  c  This library is free software; you can redistribute it and/or
  c  modify it under the terms of the GNU Lesser General Public
@@ -21,6 +21,8 @@
 
 package com.motekew.vse.c0ntm;
 
+import com.motekew.vse.enums.IGetBasis3D;
+import com.motekew.vse.enums.Basis3D;
 import com.motekew.vse.math.Matrix3X3;
 import com.motekew.vse.math.Quaternion;
 import com.motekew.vse.math.Tuple3D;
@@ -43,7 +45,7 @@ import com.motekew.vse.math.Tuple3D;
  * multiplying the current attitude DCM by the transpose of the desired
  * DCM (as implemented below) makes more sense for either case.
  * <P>
- * u_vec is the resulting vector of torques about three axes at a given
+ * uvec is the resulting vector of torques about three axes at a given
  * moment with the objective of transforming the attitude of the object
  * being modeled from its current state to a desired one.  The resulting
  * torques are derived from the sum of a kinetic and potential contribution.
@@ -71,34 +73,38 @@ import com.motekew.vse.math.Tuple3D;
  * the transpose of [Rd].  The values of the gain parameters
  * determine the behavior of the control system (critically/over/under
  * damped).  
- *
  * <P>
  * More info on inputs can be found in the documentation for each
  * respective "set()" method below.
+ * <P>
+ * This class is not thread safe.
  * 
  * @author  Kurt Motekew
  * @since   20110609
+ * @since   20131109   Implemented IGetBasis3D interface
  */
-public class AttitudeControlDCM {
+public class AttitudeControlDCM implements IGetBasis3D {
+  private Tuple3D uvec = new Tuple3D();
 
     // Default gain values to null -> control provides no outpt
   private Matrix3X3 kv = null;                      // potential gain
   private Matrix3X3 kp = null;                      // kinetic gain
   private Tuple3D ai = new Tuple3D(1.0, 1.0, 1.0);  // axes weighting
 
-    // getU Cache - quaternion inputs.
+    // computeU Cache - quaternion inputs.
   private class ControlQCache {
     Matrix3X3 currentAtt = new Matrix3X3();
     Matrix3X3 desiredAtt = new Matrix3X3();
   }
   private ControlQCache cntQC = new ControlQCache();
 
-    // getU Cache - DCM inputs
+    // computeU Cache - DCM inputs
   private class ControlCache {
     Matrix3X3 rotX180 = new Matrix3X3();
     Matrix3X3 desiredAttT = new Matrix3X3();
     Matrix3X3 deltaAtt = new Matrix3X3();
     Tuple3D omegaA = new Tuple3D();
+    Tuple3D uvec_k = new Tuple3D();
     ControlCache() {
       rotX180.identity();
       rotX180.put(2,2, -1.0);
@@ -112,6 +118,16 @@ public class AttitudeControlDCM {
    * default, resulting in no control outputs.
    */
   public AttitudeControlDCM() {
+  }
+
+  @Override
+  /**
+   * return    Torque about desired [X, Y, Z]' axes, in units consistent
+   *           with the call to computeU.  These are the control vector
+   *           values.
+   */
+  public double get(Basis3D ndx) {
+    return uvec.get(ndx);
   }
 
   /**
@@ -196,11 +212,8 @@ public class AttitudeControlDCM {
    *
    * @param   wvec         Attitude rates, [roll_rate, pitch_rate, yaw_rate]'
    *                       relative to the body frame.  rad/time_unit
-   * @param   uvec         Output:  Torque about [X, Y, Z]' axes, in consistent
-   *                       units.  The control vector.
-   * @return               Pointer to uvec
    */
-  public Tuple3D getU(Tuple3D wvec, Tuple3D uvec) {
+  public void computeU(Tuple3D wvec) {
       // Compute kinetic part if gain matrix has been set.  Make sure
       // to zero return vector just in case it isn't set.
     uvec.zero();
@@ -208,51 +221,39 @@ public class AttitudeControlDCM {
       uvec.mult(kv, wvec);   // Reuse omegaA for kinetic contribution
       uvec.mult(-1.0);
     }
-
-    return uvec;
   }
 
   /**
-   * Same as getU() below, except with quaternion attitudes (current
+   * Same as computeU() below, except with quaternion attitudes (current
    * and desired) as inputs.
    *
    * @param   currentAtt   Current inertial attitude quaternion
    * @param   desiredAtt   Desired inertial attitude quaternion
    * @param   wvec         Attitude rates, [roll_rate, pitch_rate, yaw_rate]'
    *                       relative to the body frame.  rad/time_unit
-   * @param   uvec         Output:  Torque about [X, Y, Z]' axes, in consistent
-   *                       units.  The control vector.
-   * @return               Pointer to uvec
    */
-  public Tuple3D getU(Quaternion currentAtt, Quaternion desiredAtt,
-                                             Tuple3D wvec, Tuple3D uvec) {
+  public void computeU(Quaternion currentAtt, Quaternion desiredAtt,
+                                                       Tuple3D wvec) {
       // Simply convert current and desired attitudes to DCMs, then pass along.
     cntQC.currentAtt.set(currentAtt);
     cntQC.desiredAtt.set(desiredAtt);
-    getU(cntQC.currentAtt, cntQC.desiredAtt, wvec, uvec);
-
-    return uvec;
+    computeU(cntQC.currentAtt, cntQC.desiredAtt, wvec);
   }
 
   /**
-   * Same as getU() below, except with current attitude as a quaternion
+   * Same as computeU() below, except with current attitude as a quaternion
    * and desired as a DCM.
    *
    * @param   currentAtt   Current inertial attitude quaternion
    * @param   desiredAtt   Desired inertial DCM
    * @param   wvec         Attitude rates, [roll_rate, pitch_rate, yaw_rate]'
    *                       relative to the body frame.  rad/time_unit
-   * @param   uvec         Output:  Torque about [X, Y, Z]' axes, in consistent
-   *                       units.  The control vector.
-   * @return               Pointer to uvec
    */
-  public Tuple3D getU(Quaternion currentAtt, Matrix3X3 desiredAtt,
-                                             Tuple3D wvec, Tuple3D uvec) {
+  public void computeU(Quaternion currentAtt, Matrix3X3 desiredAtt,
+                                                      Tuple3D wvec) {
       // Simply convert current and desired attitudes to DCMs, then pass along.
     cntQC.currentAtt.set(currentAtt);
-    getU(cntQC.currentAtt, desiredAtt, wvec, uvec);
-
-    return uvec;
+    computeU(cntQC.currentAtt, desiredAtt, wvec);
   }
 
   /**
@@ -267,12 +268,12 @@ public class AttitudeControlDCM {
    * @param   desiredAtt   Desired inertial attitude transformation matrix.
    * @param   wvec         Attitude rates, [roll_rate, pitch_rate, yaw_rate]'
    *                       relative to the body frame.  rad/time_unit
-   * @param   uvec         Output:  Torque about [X, Y, Z]' axes, in consistent
-   *                       units.  The control vector.
-   * @return               Pointer to uvec
    */
-  public Tuple3D getU(Matrix3X3 currentAtt, Matrix3X3 desiredAtt,
-                                            Tuple3D wvec, Tuple3D uvec) {
+  public void computeU(Matrix3X3 currentAtt, Matrix3X3 desiredAtt,
+                                                     Tuple3D wvec) {
+      // Compute kinetic portion and add to potential below
+    computeU(wvec);
+    cntC.uvec_k.set(this);
     uvec.zero();
 
       // Compute potential part if gain matrix has been set
@@ -294,11 +295,7 @@ public class AttitudeControlDCM {
       uvec.mult(-1.0);
     }
 
-      // Reuse omegaA to return kinetic contribution
-    getU(wvec, cntC.omegaA);
-    uvec.plus(cntC.omegaA);
-
-    return uvec;
+      // kinetic and potential contribution
+    uvec.plus(cntC.uvec_k);
   }
-  
 }

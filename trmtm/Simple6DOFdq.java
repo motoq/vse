@@ -143,7 +143,7 @@ public class Simple6DOFdq implements IDiffQ {
       // First get attitude quaternion, then strapdown equation:
       // q0 = x(7);  q1 = x(8);  q2 = x(9);  q3 = x(10);
     eomC.i2bQ.set(eomC.x_6dq, XdX6DQ.Q0.ordinal()+1);
-    Strapdown.quaternionStrapdown(eomC.wBody, eomC.i2bQ, eomC.di2bQ);
+    eomC.di2bQ.set(eomC.wBody, eomC.i2bQ);
       // Update quaternion attitude derivative values:
     eomC.xd_6dq.put(XdX6DQ.Q0, eomC.di2bQ.get(Q.Q0));
     eomC.xd_6dq.put(XdX6DQ.QI, eomC.di2bQ.get(Q.QI));
@@ -194,7 +194,7 @@ public class Simple6DOFdq implements IDiffQ {
       // for transformations - pulled from current state.
       // Derivative used for equations of motion.        
     Quaternion  i2bQ = new Quaternion(); 
-    Quaternion di2bQ = new Quaternion();
+    Strapdown di2bQ = new Strapdown();
 
     State6DQ x_6dq  = new State6DQ();
     State6DQ xd_6dq = new State6DQ();

@@ -21,6 +21,7 @@
 
 package com.motekew.vse.math;
 
+import com.motekew.vse.enums.IGetBasis3D;
 import com.motekew.vse.enums.Basis3D;
 import com.motekew.vse.enums.Q;
 
@@ -40,8 +41,9 @@ import com.motekew.vse.enums.Q;
  * @author Kurt Motekew
  * @since  20070531
  * @since  20130508   Made things a bit more efficient.
+ * @since  20131109   Added IGetBasis3D interface and related changes.
  */
-public class Tuple3D extends Tuple {
+public class Tuple3D extends Tuple implements IGetBasis3D {
   private final double[] vals;
 
   /**
@@ -135,6 +137,28 @@ public class Tuple3D extends Tuple {
   }
 
   /**
+   * Necessary to avoid ambiguity with the <code>Tuple</code> set
+   * method and the Tuple3D set method below using IGetBasis3D.
+   *
+   * @param   t3d   Input 3-tuple with new values to copy.
+   */
+  public void set(Tuple3D t3d) {
+    super.set(t3d);
+  }
+
+  /**
+   * Sets this Tuple3D to the values associated with the input
+   * object implementing the <code>IGetBasis3D</code> interface.
+   *
+   * @param   b3d   Input 3-tuple with new values to adopt.
+   */
+  public void set(IGetBasis3D b3d) {
+    this.put(1, b3d.get(Basis3D.I));
+    this.put(2, b3d.get(Basis3D.J));
+    this.put(3, b3d.get(Basis3D.K));
+  }
+
+  /**
    * Gets the value of the Tuple3D given a <code>Basis3D</code>
    * enum index.
    *
@@ -142,6 +166,7 @@ public class Tuple3D extends Tuple {
    *
    * @return       A double value for the requested element
    */
+  @Override
   public double get(Basis3D ndx) {
     return vals[ndx.ordinal()];
   }

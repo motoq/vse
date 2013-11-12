@@ -1,7 +1,7 @@
 /*
  c  AttitudeDetTRIAD.java
  c
- c  Copyright (C) 2012 Kurt Motekew
+ c  Copyright (C) 2012, 2013 Kurt Motekew
  c
  c  This library is free software; you can redistribute it and/or
  c  modify it under the terms of the GNU Lesser General Public   
@@ -21,6 +21,8 @@
 
 package com.motekew.vse.c0ntm;
 
+import com.motekew.vse.enums.IGetQ;
+import com.motekew.vse.enums.Q;
 import com.motekew.vse.math.*;
 import com.motekew.vse.sensm.IPointingObsModeled;
 
@@ -30,24 +32,39 @@ import com.motekew.vse.sensm.IPointingObsModeled;
  * two sets of unit pointing vectors in the known frame and two
  * sets in the frame to be determined.  See AIAA 81-4003, "Three-Axis
  * Attitude Determination from Vector Observations", M.D. Shuster and
- * S.D. Oh.
+ * S.D. Oh.  The estimated attitude is accessed via the
+ * <code>IGetQ</code> interface
  *
  * @author   Kurt Motekew
  * @since    20120924
+ * @since    20131109  modified to use IGetQ interface
  */
-public class AttitudeDetTRIAD {
+public class AttitudeDetTRIAD implements IGetQ {
+
+  private Quaternion qAtt = new Quaternion();
+
+  /**
+   * Gets the component values the solved for attitude quaternion.
+   *
+   * @param  ndx   A <code>Q<code> indicating which component to
+   *               retrieve.
+   *
+   * @return      The double value representing the requested component
+   */
+  @Override
+  public double get(Q ndx) {
+    return qAtt.get(ndx);
+  }
 
   /**
    * See definition below for more info.
    *
    * @param    sensors    Measurements and known/modeled reference point
    *                      supplier
-   * @param    qAtt       Output quaternion representing a frame rotation
-   *                      from the sensor to known reference frame.
    *
    * @return              Zero
    */ 
-  public int estimateAtt(IPointingObsModeled[] sensors, Quaternion qAtt) {
+  public int estimateAtt(IPointingObsModeled[] sensors) {
     Matrix3X3 mat = new Matrix3X3();
     int nitr =  estimateAtt(sensors, mat);
     qAtt.set(mat);
@@ -68,7 +85,7 @@ public class AttitudeDetTRIAD {
    *
    * @return              Zero
    */ 
-  public int estimateAtt(IPointingObsModeled[] sensors, Matrix3X3 amat) {
+  private int estimateAtt(IPointingObsModeled[] sensors, Matrix3X3 amat) {
     int numSensors = sensors.length;
 
     if (numSensors < 2) {

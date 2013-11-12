@@ -32,7 +32,7 @@ import com.motekew.vse.enums.*;
  * @author Kurt Motekew
  * @since  20080830
  */
-public class Quaternion {
+public class Quaternion implements IGetQ {
     /** tolerance value used for numeric considerations */
   public static final double TOL = 0.000001;
     /** 
@@ -110,9 +110,11 @@ public class Quaternion {
    * Gets the component values of this quaternion.
    *
    * @param  ndx   A <code>Q<code> indicating which component to
-   *               modify.
+   *               retrieve.
+   *
    * @return      The double value representing the requested component
    */
+  @Override
   public double get(Q ndx) {
     switch(ndx) {
       case Q0:
@@ -145,16 +147,16 @@ public class Quaternion {
   }
 
   /**
-   * Copy components one for one from the passed Quaternion into this one.
+   * Copy components one for one from the object implementing the IGetQ
+   * interface into this Quaternion.
    *
-   * @param  quat   A Quaternion for which this Quaternion's values are to be
-   *                set.
+   * @param  igq    An object implementing the IGetQ interface.
    */
-  public void set(Quaternion quat) {
-    q0 = quat.get(Q0);
-    qi = quat.get(QI);
-    qj = quat.get(QJ);
-    qk = quat.get(QK);
+  public void set(IGetQ igq) {
+    q0 = igq.get(Q0);
+    qi = igq.get(QI);
+    qj = igq.get(QJ);
+    qk = igq.get(QK);
   }
 
   /**

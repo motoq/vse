@@ -27,9 +27,9 @@ import com.motekew.vse.math.Quaternion;
 import com.motekew.vse.math.Tuple3D;
 
 /**
- * This class contains static methods that compute "inertial" body
- * attitude rates given body relative attitude rates.  This is often
- * refered to as the "strapdown equation".
+ * This extension of the <code>Quaternion</code> class represents attitude
+ * rates in quaternion space given the quaternion attitude and body axes
+ * rates.
  * <P>
  * Basically, the "inertial" attitude, and body relative roll, pitch,
  * and yaw rates, are combined to produce the "inertial" attitude
@@ -40,29 +40,28 @@ import com.motekew.vse.math.Tuple3D;
  *
  * @author  Kurt Motekew
  * @since   20081214
+ * @since   20131111  Decided to make this an extension of the Quaternion
  */
-public final class Strapdown {
+public class Strapdown extends Quaternion {
 
   /**
-   * Default constructor - don't allow it to be instantiated
+   * Initialize with all rates set to zero.
    */
-  private Strapdown() {
+  public Strapdown() {
+    super(0.0, 0.0, 0.0, 0.0);
   }
 
   /**
    * Given the body relative roll pitch and yaw rates, along with the current
    * body attitude in some inertial frame, compute the attitude rate in
-   * that frame.
-   * 
+   * that frame.  Units are consisten with the input attitude rate units.
+   *
    * @param   pqr              Body relative roll, pitch, and yaw rates
    *                           (rad/time unit)
    * @param   attitude         Body attitude in inertial/computational reference
    *                           frame.
-   * @param   attitude_rate    Rate of change in attitude in inertial/computational
-   *                           reference frame.  Same time units as pqr.
    */
-  public static void quaternionStrapdown(Tuple3D pqr, Quaternion attitude,
-                                                 Quaternion attitude_rate) {
+  public void set(Tuple3D pqr, Quaternion attitude) {
       // body attitude rates in body frame
     double p  = pqr.get(Basis3D.I);  // P, dphi,   roll rate
     double q  = pqr.get(Basis3D.J);  // Q, dtheta, pitch rate
@@ -73,9 +72,9 @@ public final class Strapdown {
     double q2 = attitude.get(Q.QJ);
     double q3 = attitude.get(Q.QK);
 
-    attitude_rate.put(Q.Q0,  -0.5*( p*q1 + q*q2 + r*q3) );           
-    attitude_rate.put(Q.QI,  -0.5*(-p*q0 - r*q2 + q*q3) );
-    attitude_rate.put(Q.QJ,  -0.5*(-q*q0 + r*q1 - p*q3) );
-    attitude_rate.put(Q.QK,  -0.5*(-r*q0 - q*q1 + p*q2) );
+    this.put(Q.Q0,  -0.5*( p*q1 + q*q2 + r*q3) );           
+    this.put(Q.QI,  -0.5*(-p*q0 - r*q2 + q*q3) );
+    this.put(Q.QJ,  -0.5*(-q*q0 + r*q1 - p*q3) );
+    this.put(Q.QK,  -0.5*(-r*q0 - q*q1 + p*q2) );
   }
 }
