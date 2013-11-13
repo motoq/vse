@@ -79,6 +79,18 @@ public class Tuple extends VectorSpace {
   }
 
   /**
+   * Initialize this Tuple using a Matrix.
+   * A <code>VectorSpaceArgumentException.java</code> will be thrown if
+   * the incoming matrix isn't a column matrix.
+   *
+   * @param  mtx    A Matrix for which this Tuples's values are initialized.
+   */
+  public Tuple(Matrix mtx) {
+    this(mtx.M);
+    this.set(mtx);
+  }
+
+  /**
    * Returns the dimension of the VectorSpace
    *
    * @return    int number of dimensions

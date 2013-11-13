@@ -105,7 +105,7 @@ public class AttitudeDetQuat implements IGetQ {
    *                      returned if less than two measurements were
    *                      passed in.
    */
-  public int estimateAtt(IPointingObsModeled[] sensors) {
+  public int set(IPointingObsModeled[] sensors) {
     int numSensors = sensors.length;
 
       // First check to see if enough measurements are present
@@ -147,7 +147,7 @@ public class AttitudeDetQuat implements IGetQ {
       // as long as there are three input vectors.  A good guess makes it
       // work better with 2 measurements, or when the measurements are
       // extra noisy.
-    attInit.estimateAtt(sensors);
+    attInit.set(sensors);
     qAtt.set(attInit);
     qAtt.standardize();
     phat.set(1, qAtt);
@@ -217,7 +217,7 @@ public class AttitudeDetQuat implements IGetQ {
       nitr = -1;
     }
     return nitr;    
-  } // ESCA
+  }
 
   /**
    * @return   A copy of the most recently generated quaternion

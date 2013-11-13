@@ -21,7 +21,6 @@
 
 package com.motekew.vse.c0ntm;
 
-import com.motekew.vse.enums.IGetBasis3D;
 import com.motekew.vse.enums.Basis3D;
 import com.motekew.vse.math.Matrix3X3;
 import com.motekew.vse.math.Quaternion;
@@ -81,9 +80,9 @@ import com.motekew.vse.math.Tuple3D;
  * 
  * @author  Kurt Motekew
  * @since   20110609
- * @since   20131109   Implemented IGetBasis3D interface
+ * @since   20131109   Implemented IAttitudeControl interface
  */
-public class AttitudeControlDCM implements IGetBasis3D {
+public class AttitudeControlDCM implements IAttitudeControl {
   private Tuple3D uvec = new Tuple3D();
 
     // Default gain values to null -> control provides no outpt
@@ -122,6 +121,9 @@ public class AttitudeControlDCM implements IGetBasis3D {
 
   @Override
   /**
+   * Retrieves attitude aontrol torques based on previously called
+   * set() method.
+   *
    * return    Torque about desired [X, Y, Z]' axes, in units consistent
    *           with the call to computeU.  These are the control vector
    *           values.
@@ -213,7 +215,8 @@ public class AttitudeControlDCM implements IGetBasis3D {
    * @param   wvec         Attitude rates, [roll_rate, pitch_rate, yaw_rate]'
    *                       relative to the body frame.  rad/time_unit
    */
-  public void computeU(Tuple3D wvec) {
+  @Override
+  public void set(Tuple3D wvec) {
       // Compute kinetic part if gain matrix has been set.  Make sure
       // to zero return vector just in case it isn't set.
     uvec.zero();
@@ -224,7 +227,7 @@ public class AttitudeControlDCM implements IGetBasis3D {
   }
 
   /**
-   * Same as computeU() below, except with quaternion attitudes (current
+   * Same as set() below, except with quaternion attitudes (current
    * and desired) as inputs.
    *
    * @param   currentAtt   Current inertial attitude quaternion
@@ -232,16 +235,17 @@ public class AttitudeControlDCM implements IGetBasis3D {
    * @param   wvec         Attitude rates, [roll_rate, pitch_rate, yaw_rate]'
    *                       relative to the body frame.  rad/time_unit
    */
-  public void computeU(Quaternion currentAtt, Quaternion desiredAtt,
-                                                       Tuple3D wvec) {
+  @Override
+  public void set(Quaternion currentAtt, Quaternion desiredAtt,
+                                                  Tuple3D wvec) {
       // Simply convert current and desired attitudes to DCMs, then pass along.
     cntQC.currentAtt.set(currentAtt);
     cntQC.desiredAtt.set(desiredAtt);
-    computeU(cntQC.currentAtt, cntQC.desiredAtt, wvec);
+    set(cntQC.currentAtt, cntQC.desiredAtt, wvec);
   }
 
   /**
-   * Same as computeU() below, except with current attitude as a quaternion
+   * Same as set() below, except with current attitude as a quaternion
    * and desired as a DCM.
    *
    * @param   currentAtt   Current inertial attitude quaternion
@@ -249,11 +253,12 @@ public class AttitudeControlDCM implements IGetBasis3D {
    * @param   wvec         Attitude rates, [roll_rate, pitch_rate, yaw_rate]'
    *                       relative to the body frame.  rad/time_unit
    */
-  public void computeU(Quaternion currentAtt, Matrix3X3 desiredAtt,
+  @Override
+  public void set(Quaternion currentAtt, Matrix3X3 desiredAtt,
                                                       Tuple3D wvec) {
       // Simply convert current and desired attitudes to DCMs, then pass along.
     cntQC.currentAtt.set(currentAtt);
-    computeU(cntQC.currentAtt, desiredAtt, wvec);
+    set(cntQC.currentAtt, desiredAtt, wvec);
   }
 
   /**
@@ -269,10 +274,11 @@ public class AttitudeControlDCM implements IGetBasis3D {
    * @param   wvec         Attitude rates, [roll_rate, pitch_rate, yaw_rate]'
    *                       relative to the body frame.  rad/time_unit
    */
-  public void computeU(Matrix3X3 currentAtt, Matrix3X3 desiredAtt,
+  @Override
+  public void set(Matrix3X3 currentAtt, Matrix3X3 desiredAtt,
                                                      Tuple3D wvec) {
       // Compute kinetic portion and add to potential below
-    computeU(wvec);
+    set(wvec);
     cntC.uvec_k.set(this);
     uvec.zero();
 

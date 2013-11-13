@@ -92,7 +92,7 @@ public class AttitudeDetDQuat implements IGetQ {
    *                      returned if less than two measurements were
    *                      passed in.
    */ 
-  public int estimateAtt(IPointingObsModeled[] sensors) {
+  public int set(IPointingObsModeled[] sensors) {
     int numSensors = sensors.length;
 
       // First check to see if enough measurements are present
@@ -128,7 +128,7 @@ public class AttitudeDetDQuat implements IGetQ {
     Tuple2D sigmaUV = new Tuple2D();
     double sii, sjj, wii, wjj;
 
-    attInit.estimateAtt(sensors);
+    attInit.set(sensors);
     qAtt.set(attInit);
     int nMeas;
     for (nitr=1; nitr<maxitr; nitr++) {
@@ -189,7 +189,7 @@ public class AttitudeDetDQuat implements IGetQ {
       nitr = -1;
     }
     return nitr;    
-  } // ESCA
+  }
 
     /**
      * @return maximum iterations used for WLS solution

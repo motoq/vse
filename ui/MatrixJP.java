@@ -99,15 +99,11 @@ public class MatrixJP extends JPanel implements Errorable, IEditError {
   }
 
   /**
-   * Copies the contents of the displayed values to mOut.  Dimensions
-   * must match.
-   *
-   * @param   mOut    Output:  Matrix into which displayed values are copied.
-   * @return          A pointer to mOut.
+   * @return          A new Matrix of the displayed values.
    */
-  public Matrix get(Matrix mOut) {
+  public Matrix get() {
     updateMatrixValues();
-    mOut.set(mtx);
+    Matrix mOut = new Matrix(mtx);
     return mOut;
   }
 
@@ -118,9 +114,9 @@ public class MatrixJP extends JPanel implements Errorable, IEditError {
    * @param   tOut    Output:  Tuple into which displayed values are copied.
    * @return          A pointer to tOut.
    */
-  public Tuple get(Tuple tOut) {
+  public Tuple getTup() {
     updateMatrixValues();
-    tOut.set(mtx);
+    Tuple tOut = new Tuple(mtx);
     return tOut;
   }
 

@@ -492,23 +492,6 @@ public class Quaternion implements IGetQ {
   }
 
   /**
-   * Sets this quaternion to be the (linear) state transition
-   * quaternion given a duration and angular velocity vector, which
-   * is assumed to be fixed in time.  Based on "Strapdown Inertial
-   * Navigation Technology", Chapt 11, by Titterton and Weston.
-   *
-   * @param   dt      Propagation time
-   * @param   omega   Angular velocity vector, units consistent with dt
-   */
-  public void stateTransition(double dt, Tuple3D omega) {
-    double ang = dt*omega.mag();
-    Tuple3D evec = new Tuple3D();
-    evec.set(omega);
-    evec.unitize();
-    set(ang, evec);
-  }
-
-  /**
    * Prints the components of this <code>Quaternion</code>
    */
   public String toString() {

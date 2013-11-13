@@ -57,26 +57,27 @@ public class AttitudeDetTRIAD implements IGetQ {
   }
 
   /**
-   * See definition below for more info.
+   * Determine the Quaternion transforming known pointing vectors in reference
+   * frame "A" to pointing vectors provided by sensors in reference frame "B".
+   * The two sensors with the smallest measurement uncertainty error
+   * budgets are used (or the first two, if none of the others are smaller).
+   * No consideration is given to the geometry of the sensors.
    *
    * @param    sensors    Measurements and known/modeled reference point
    *                      supplier
    *
    * @return              Zero
    */ 
-  public int estimateAtt(IPointingObsModeled[] sensors) {
+  public int set(IPointingObsModeled[] sensors) {
     Matrix3X3 mat = new Matrix3X3();
     int nitr =  estimateAtt(sensors, mat);
     qAtt.set(mat);
     return nitr;
-  }  // ESCA
+  }
 
-  /**
+  /*
    * Determine the DCM transforming known pointing vectors in reference
    * frame "A" to pointing vectors provided by sensors in reference frame "B".
-   * The two sensors with the smallest measurement uncertainty error
-   * budgets are used (or the first two, if none of the others are smaller).
-   * No consideration is given to the geometry of the sensors.
    *
    * @param    sensors    Measurements and known/modeled reference point
    *                      supplier.  At least two are needed.
@@ -84,7 +85,7 @@ public class AttitudeDetTRIAD implements IGetQ {
    *                      from the sensor to known reference frame.
    *
    * @return              Zero
-   */ 
+   */
   private int estimateAtt(IPointingObsModeled[] sensors, Matrix3X3 amat) {
     int numSensors = sensors.length;
 
@@ -178,6 +179,6 @@ public class AttitudeDetTRIAD implements IGetQ {
     amat.mult(mObs, mRef);
 
     return 0;    
-  } // ESCA
+  }
 
 }
