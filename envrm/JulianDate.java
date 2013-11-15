@@ -148,7 +148,7 @@ public class JulianDate {
    *
    * @iparam   jdb   Julian Date to subtract from this
    *
-   * @oparam         this - jdb
+   * @return         this - jdb
    */
   public double minus(JulianDate jdb) {
     return (jdHi - jdb.getJDHi()) + (jdLo - jdb.getJDLo());

@@ -1,7 +1,7 @@
 /*
  c  TestSpacecraft.java
  c
- c  Copyright (C) 2000, 2008 Kurt Motekew
+ c  Copyright (C) 2000, 2013 Kurt Motekew
  c
  c  This library is free software; you can redistribute it and/or
  c  modify it under the terms of the GNU Lesser General Public
@@ -22,15 +22,16 @@
 package com.motekew.vse.j3d.meshmodels;
 
 import java.net.URL;
-import com.sun.j3d.utils.geometry.GeometryInfo;   // new
+import com.sun.j3d.utils.geometry.GeometryInfo;
 import com.sun.j3d.utils.geometry.Sphere;
 import com.sun.j3d.loaders.*;
 import com.sun.j3d.loaders.objectfile.ObjectFile;
 import javax.media.j3d.*;
 import javax.vecmath.Vector3d;
 import javax.vecmath.Matrix3d;
-import javax.vecmath.Point3f;   // new
+import javax.vecmath.Point3f;
 
+import com.motekew.vse.enums.Basis3D;
 import com.motekew.vse.strtm.MassDyadic;
 
 /**
@@ -54,24 +55,24 @@ public class TestSpacecraft extends TransformGroup {
    */
   private static double XOFF = 0.25;
 
+  private BranchGroup modelBG;
+  private float sf = 1.0f;
+
   /**
-   * Initialize with model scale set to 1.0 and don't compute inertia
-   * properties.
+   * Initialize with model scale set to 1.0.
    */
   public TestSpacecraft() {
-    this(1.0, 0.0, null);
+    this(1.0);
   }
 
   /**
-   * Initialize with input scale factor.
+   * Initialize with input scale factor.  The model BranchGroup is retained
+   * allowing for the getMassDyadic function to retrieve vertex info.
    * 
    * @param    scale    Scale factor for the model.  A scale of
-   *                    1.0 means the distance from the model origin, to the
-   *                    furthest point on the model, will be one unit long.
-   * @param    mass     Input:  Total mass of the solid model.
-   * @param    mI       Output:  inertia tensor
    */
-  public TestSpacecraft(double scale, double mass, MassDyadic mI) {
+  public TestSpacecraft(double scale) {
+    sf = (float) scale;
       // allow the state of the model to be changed after compilation
     setCapability(TransformGroup.ALLOW_TRANSFORM_READ);
     setCapability(TransformGroup.ALLOW_TRANSFORM_WRITE);
@@ -104,36 +105,59 @@ public class TestSpacecraft extends TransformGroup {
       m2.mul(m1);                    // combine
       Transform3D t3d = new Transform3D(m2, trans, scale);
       TransformGroup tg = new TransformGroup(t3d);
-      BranchGroup modelBG = modelScene.getSceneGroup();
+      modelBG = modelScene.getSceneGroup();
       
-      if (mass > 0.0  &&  mI != null) {
-        Shape3D s3d = (Shape3D) modelBG.getChild(0);
-        GeometryArray ga = (GeometryArray)s3d.getGeometry();
-        GeometryInfo geometryInfo = new GeometryInfo(ga);
-        Point3f[] verts = geometryInfo.getCoordinates();
-        float ixx = 0.0f;
-        float iyy = 0.0f;
-        float izz = 0.0f;
-        float ixy = 0.0f;
-        float ixz = 0.0f;
-        float iyz = 0.0f;
-        for (int ii=0; ii<verts.length; ii++) {
-          ixx += verts[ii].y*verts[ii].y + verts[ii].z*verts[ii].z;
-          iyy += verts[ii].x*verts[ii].x + verts[ii].z*verts[ii].z;
-          izz += verts[ii].x*verts[ii].x + verts[ii].y*verts[ii].y;
-          ixy += verts[ii].x*verts[ii].y;
-          ixz += verts[ii].x*verts[ii].z;
-          iyz += verts[ii].y*verts[ii].z;
-        }
-        System.out.println("" + ixx + "  " + iyy + "  " + izz);
-        System.out.println("" + ixy + "  " + ixz + "  " + iyz);
-      }
-
       tg.addChild(modelBG);
       addChild(tg);
     } catch(java.io.FileNotFoundException ex) {
         // if the above didn't work, load a sphere
       addChild(new Sphere(1.0f));
     }
+  }
+
+  /**
+   * Not yet tested - pulls and scales model vertex values to compute
+   * moments of inertia.  NOTE:  Check orientation of model axes vs.
+   * body axes....
+   *
+   * @param    mass     Total mass of the solid model.  Moments
+   *                    assume all mass is evenly distributed at
+   *                    each *vertex* point (not throughout solid).                    
+   * @return            Inertia tensor based on input mass units and
+   *                    the distance units from class instatniation.
+  */
+  public MassDyadic getMassDyadic(double mass) {
+    Shape3D s3d = (Shape3D) modelBG.getChild(0);
+    GeometryArray ga = (GeometryArray)s3d.getGeometry();
+    GeometryInfo geometryInfo = new GeometryInfo(ga);
+    Point3f[] verts = geometryInfo.getCoordinates();
+    double ixx = 0.0;
+    double iyy = 0.0;
+    double izz = 0.0;
+    double ixy = 0.0;
+    double ixz = 0.0;
+    double iyz = 0.0;
+    double dm = mass/verts.length;
+    for (int ii=0; ii<verts.length; ii++) {
+      verts[ii].x *= sf;
+      verts[ii].y *= sf;
+      verts[ii].z *= sf;
+    }
+    for (int ii=0; ii<verts.length; ii++) {
+      ixx += dm * (double) (verts[ii].y*verts[ii].y + verts[ii].z*verts[ii].z);
+      iyy += dm * (double) (verts[ii].x*verts[ii].x + verts[ii].z*verts[ii].z);
+      izz += dm * (double) (verts[ii].x*verts[ii].x + verts[ii].y*verts[ii].y);
+      ixy += dm * (double) (verts[ii].x*verts[ii].y);
+      ixz += dm * (double) (verts[ii].x*verts[ii].z);
+      iyz += dm * (double) (verts[ii].y*verts[ii].z);
+    }
+    MassDyadic mI = new MassDyadic();
+    mI.put(Basis3D.I, Basis3D.I, ixx);
+    mI.put(Basis3D.J, Basis3D.J, iyy);
+    mI.put(Basis3D.K, Basis3D.K, izz);
+    mI.put(Basis3D.I, Basis3D.J, ixy);
+    mI.put(Basis3D.I, Basis3D.K, ixz);
+    mI.put(Basis3D.J, Basis3D.K, iyz);
+    return mI;
   }
 }

@@ -178,43 +178,68 @@ public class WGS84EGM96Ref implements ICentralBodyReference {
   }
 
   /**
-   * Fills the input matrix with unnormalized gravitational coefficients
-   * (cosine coefficients).  If the input matrix is larger than the available
-   * number of coefficients, the remaining elements will be set to zero.
-   * the calling function may then trim this matrix, if desired.
+   * @return   Maximum degree of gravitational model
    */
   @Override
-  public void unnormalizedGravityCosCoeff(Matrix mtx) {
-    int ii, jj;
-    int m = mtx.numRows();
-    int n = mtx.numCols();
+  public int getDegree() { return DEGORDER; }
 
+  /**
+   * @return   Maximum order of gravitational model
+   */
+  @Override
+  public int getOrder() { return DEGORDER; }
+
+  /**
+   * Creates a matrix of unnormalized gravitational cosine coefficients.  If
+   * the requested number of coefficients is greater than the available number,
+   * then the returned matrix will still be of the requested size.  However,
+   * the remaining elements will be zero.
+   *
+   * @param   m   Requested degree of gravity model
+   * @param   n   Requested order of gravity model
+   *
+   * @return      [m+1]X[n+1] matrix filled with available coefficients
+   */
+  @Override
+  public Matrix unnormalizedGravityCosCoeff(int m, int n) {
+    int ii, jj;
+    m++;
+    n++;
+      // Allocate
+    Matrix mtx = new Matrix(m, n);
+      // Determine fill limits
     if (m > cl.numRows()) {
       m = cl.numRows();
     }
     if (n > cl.numCols()) {
       n = cl.numCols();
     }
-
-    mtx.zero();
+      // fill
     for (ii=1; ii<=m; ii++) {
       for (jj=1; jj<=n; jj++) {
         mtx.put(ii, jj, cl.get(ii, jj));
       }
     }
+    return mtx;
   }
 
   /**
-   * Fills the input matrix with unnormalized gravitational coefficients
-   * (sine coefficients).  If the input matrix is larger than the available
-   * number of coefficients, the remaining elements will be set to zero.
-   * the calling function may then trim this matrix, if desired.
+   * Creates a matrix of unnormalized gravitational sine coefficients.  If
+   * the requested number of coefficients is greater than the available number,
+   * then the returned matrix will still be of the requested size.  However,
+   * the remaining elements will be zero.
+   *
+   * @param   m   Requested degree of gravity model
+   * @param   n   Requested order of gravity model
+   *
+   * @return      [m+1]X[n+1] matrix filled with available coefficients
    */
   @Override
-  public void unnormalizedGravitySinCoeff(Matrix mtx) {
+  public Matrix unnormalizedGravitySinCoeff(int m, int n) {
     int ii, jj;
-    int m = mtx.numRows();
-    int n = mtx.numCols();
+    m++;
+    n++;
+    Matrix mtx = new Matrix(m, n);
 
     if (m > sl.numRows()) {
       m = sl.numRows();
@@ -222,12 +247,11 @@ public class WGS84EGM96Ref implements ICentralBodyReference {
     if (n > sl.numCols()) {
       n = sl.numCols();
     }
-
-    mtx.zero();
     for (ii=1; ii<=m; ii++) {
       for (jj=1; jj<=n; jj++) {
         mtx.put(ii, jj, sl.get(ii, jj));
       }
     }
+    return mtx;
   }
 }

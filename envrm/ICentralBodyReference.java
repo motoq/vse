@@ -67,13 +67,23 @@ public interface ICentralBodyReference {
   public double angularVelocity();
 
   /**
+   * @return   Maximum degree of gravitational model
+   */
+  public int getDegree();
+
+  /**
+   * @return   Maximum order of gravitational model
+   */
+  public int getOrder();
+
+  /**
    * Sets unnormalized gravitational coefficients (Cosine)
    */
-  public void unnormalizedGravityCosCoeff(Matrix mtx);
+  public Matrix unnormalizedGravityCosCoeff(int m, int n);
 
   /**
    * Sets unnormalized gravitational coefficients (Sine)
    */
-  public void unnormalizedGravitySinCoeff(Matrix mtx);
+  public Matrix unnormalizedGravitySinCoeff(int m, int n);
 
 }
