@@ -249,10 +249,8 @@ public class Matrix3X3 extends Matrix {
    * is inverted by dividing the adjoint of it by the determinant.
    *
    * @param   m  Matrix3X3 to be inverted
-   *
-   * @return     Pointer to this matrix
    */
-  public Matrix3X3 invert(Matrix3X3 m) {
+  public void invert(Matrix3X3 m) {
     double det = m.det();
     if (Math.abs(det) > Matrix.EPS) {
       vals[0][0] =       m.get(2,2)*m.get(3,3) - m.get(3,2)*m.get(2,3);
@@ -269,7 +267,6 @@ public class Matrix3X3 extends Matrix {
       throw(new SingularMatrixException("Can't invert matrix, determinant = "
                                                                       + det));
     }
-    return this;
   }
 
   /**
@@ -278,18 +275,14 @@ public class Matrix3X3 extends Matrix {
    *
    * @param    alpha    Rotation angle about X-axis, radians
    *
-   * @return            A pointer to this matrix
-   *
    */
-  public Matrix3X3 rotX(double alpha) {
+  public void rotX(double alpha) {
     double calpha = Math.cos(alpha);
     double salpha = Math.sin(alpha);
 
     vals[0][0] = 1.0;  vals[0][1] =     0.0;  vals[0][2] =    0.0;
     vals[1][0] = 0.0;  vals[1][1] =  calpha;  vals[1][2] = salpha;
     vals[2][0] = 0.0;  vals[2][1] = -salpha;  vals[2][2] = calpha;
-
-    return this;
   }
 
   /**
@@ -297,19 +290,14 @@ public class Matrix3X3 extends Matrix {
    * a rotation about the Y-axis by the input angle.
    *
    * @param    alpha    Rotation angle about Y-axis, radians
-   *
-   * @return            A pointer to this matrix
-   *
    */
-  public Matrix3X3 rotY(double alpha) {
+  public void rotY(double alpha) {
     double calpha = Math.cos(alpha);
     double salpha = Math.sin(alpha);
 
     vals[0][0] = calpha;  vals[0][1] = 0.0;  vals[0][2] = -salpha;
     vals[1][0] =    0.0;  vals[1][1] = 1.0;  vals[1][2] =     0.0;
     vals[2][0] = salpha;  vals[2][1] = 0.0;  vals[2][2] =  calpha;
-
-    return this;
   }
 
   /**
@@ -317,19 +305,13 @@ public class Matrix3X3 extends Matrix {
    * a rotation about the Z-axis by the input angle.
    *
    * @param    alpha    Rotation angle about Z-axis, radians
-   *
-   * @return            A pointer to this matrix
-   *
    */
-  public Matrix3X3 rotZ(double alpha) {
+  public void rotZ(double alpha) {
     double calpha = Math.cos(alpha);
     double salpha = Math.sin(alpha);
 
     vals[0][0] =  calpha;  vals[0][1] = salpha;  vals[0][2] = 0.0;
     vals[1][0] = -salpha;  vals[1][1] = calpha;  vals[1][2] = 0.0;
     vals[2][0] =     0.0;  vals[2][1] =    0.0;  vals[2][2] = 1.0;
-
-    return this;
   }
-
 }

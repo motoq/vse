@@ -1,5 +1,5 @@
 /*
- c  Acceleration.java
+ c  Position.java
  c
  c  Copyright (C) 2013 Kurt Motekew
  c
@@ -21,36 +21,36 @@
 
 package com.motekew.vse.trmtm;
 
-import com.motekew.vse.enums.IGetDDX3D;
-import com.motekew.vse.enums.DDX3D;
+import com.motekew.vse.enums.IGetX3D;
+import com.motekew.vse.enums.X3D;
 import com.motekew.vse.enums.Basis3D;
 import com.motekew.vse.math.Tuple3D;
 
 /**
  * Specialization of the Tuple3D class, to be recognized as a vector
- * with components of acceleration.
+ * with components of position.
  *
  * @author Kurt Motekew
  * @since  20131116
  */
-public class Acceleration extends Tuple3D {
+public class Position extends Tuple3D {
 
   /**
-   * Gets the value of the Acceleration given a <code>DDX3D</code>
+   * Gets the value of the Position given a <code>X3D</code>
    * enum index.
    *
-   * @param  acc   An object with acceleration elements to copy
+   * @param  pos   An object with position elements to copy
    */
-  public void set(IGetDDX3D acc) {
-    put(Basis3D.I, acc.get(DDX3D.DDX));
-    put(Basis3D.J, acc.get(DDX3D.DDY));
-    put(Basis3D.K, acc.get(DDX3D.DDZ));
+  public void set(IGetX3D pos) {
+    put(Basis3D.I, pos.get(X3D.X));
+    put(Basis3D.J, pos.get(X3D.Y));
+    put(Basis3D.K, pos.get(X3D.Z));
   }
 
   /**
-   * @return   The requested acceleration component.
+   * @return   The requested position component.
    */
-  public double get(DDX3D ndx) {
+  public double get(X3D ndx) {
     return get(ndx.ordinal() + 1);
   }
 }

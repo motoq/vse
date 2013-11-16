@@ -467,10 +467,8 @@ public class Matrix extends VectorSpace {
    *
    * @param   aMat    Matrix to be added to this.  Must be of the same
    *                  dimensions as this Matrix.
-   *
-   * @return          Pointer to this Matrix
    */
-  public Matrix plus(Matrix aMat) {
+  public void plus(Matrix aMat) {
     int ii, jj;
     if (M == aMat.M  &&  N == aMat.N) {
       double[][] avals = aMat.valuesPtr();
@@ -483,7 +481,6 @@ public class Matrix extends VectorSpace {
      throw new VectorSpaceArgumentException("Wrong dimensions for " +
                                             "Matrix.plus(Matrix aMat)");
     }
-    return this;
   }
 
   /**
@@ -672,7 +669,7 @@ public class Matrix extends VectorSpace {
    *                 
    * @throws         VectorSpaceArgumentException if dimension are wrong
    */
-  public Matrix transpose(Matrix aMat) {
+  public void transpose(Matrix aMat) {
     if (M != aMat.N  ||  N != aMat.M) {
       throw new VectorSpaceArgumentException(
                      "Can't transpose - dimensions of input matrix incorrect");
@@ -683,7 +680,6 @@ public class Matrix extends VectorSpace {
         vals[ii][jj] = avals[jj][ii];
       }
     }
-    return this;
   }
 
   /**
@@ -701,7 +697,7 @@ public class Matrix extends VectorSpace {
    * @throws         SingularMatrixException if the matrix appears to not be
    *                 full rank.
    */
-  public void getQR(Matrix qMat, Matrix rMat) {
+  void getQR(Matrix qMat, Matrix rMat) {
       // Make sure R is NxN
     if (N != rMat.M  ||  N != rMat.N) {
       throw new VectorSpaceArgumentException(    
@@ -1017,12 +1013,10 @@ public class Matrix extends VectorSpace {
    * and then use this class' <code>solve</code> method.  <code>cholesky</code>
    * and <code>solveCH</code> may also be more appropriate.
    *
-   * @return    A pointer to this matrix
-   *
    * @throws    VectorSpaceArgumentException   If not square (runtime)
    * @throws    SingularMatrixException        If not invertible (runtime)
    */
-  public Matrix invert() {
+  public void invert() {
     if (!mxm  ||  N < 1) {
       throw new VectorSpaceArgumentException(
                                   "Can't invert non-square Matrix " + this);
@@ -1044,7 +1038,7 @@ public class Matrix extends VectorSpace {
         vals[0][1] /= -d;
         vals[1][0] /= -d;
       }
-      return this;
+      return;
     }
 
       // Decompose this matrix so it is suitable for inversion.
@@ -1069,7 +1063,6 @@ public class Matrix extends VectorSpace {
     }
     set(xmat);
     transpose();
-    return this;
   }
 
   /*

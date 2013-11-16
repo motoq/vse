@@ -21,7 +21,9 @@ public class TestQuaternion {
     Matrix3X3 rz  = new Matrix3X3();
     
     double alpha = Math.toRadians(90);
-    dcm.mult(rx.rotX(alpha), rz.rotZ(alpha));
+    rx.rotX(alpha);
+    rz.rotZ(alpha);
+    dcm.mult(rx, rz);
     System.out.println("Rx[90]*Rz[90]");
     System.out.println(""+ dcm);
     

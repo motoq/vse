@@ -1,6 +1,7 @@
 package com.motekew.vse.test;
 
 import com.motekew.vse.math.Matrix;
+import com.motekew.vse.math.QR;
 import com.motekew.vse.math.Tuple;
 
 public class TestQR {
@@ -22,18 +23,14 @@ public class TestQR {
      *  0.5  -0.5  -0.5
      */
     Matrix aMat = new Matrix(aArray);
-    int m = aMat.numRows();
-    int n = aMat.numCols();
-    Matrix qMat = new Matrix(m,n);
-    Matrix rMat = new Matrix(n,n);
-    aMat.getQR(qMat, rMat);
+    QR qr = new QR(aMat);
     System.out.println("=====================================================================");
     System.out.println("A:\n" + aMat);
-    System.out.println("Q:\n" + qMat);
-    System.out.println("R:\n" + rMat);
-    aMat.mult(qMat,rMat);
+    System.out.println("Q:\n" + qr.q);
+    System.out.println("R:\n" + qr.r);
+    aMat.mult(qr.q, qr.r);
     System.out.println("QR:\n" + aMat);
-    checkOrtho(qMat);
+    checkOrtho(qr.q);
     
     
       // Another test
@@ -61,18 +58,14 @@ public class TestQR {
     //   0.00000   0.00000   8.99370
 
     aMat = new Matrix(aArray2);
-    m = aMat.numRows();
-    n = aMat.numCols();
-    qMat = new Matrix(m,n);
-    rMat = new Matrix(n,n);
-    aMat.getQR(qMat, rMat);
+    qr.set(aMat);
     System.out.println("=====================================================================");
     System.out.println("A:\n" + aMat);
-    System.out.println("Q:\n" + qMat);
-    System.out.println("R:\n" + rMat);
-    aMat.mult(qMat,rMat);
+    System.out.println("Q:\n" + qr.q);
+    System.out.println("R:\n" + qr.r);
+    aMat.mult(qr.q,qr.r);
     System.out.println("QR:\n" + aMat);
-    checkOrtho(qMat);
+    checkOrtho(qr.q);
   }
   
   private static void checkOrtho(Matrix q) {
