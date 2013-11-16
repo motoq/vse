@@ -1,7 +1,7 @@
 /*
  c  Gravity.java
  c
- c  Copyright (C) 2000, 2012 Kurt Motekew
+ c  Copyright (C) 2000, 2013 Kurt Motekew
  c
  c  This library is free software; you can redistribute it and/or
  c  modify it under the terms of the GNU Lesser General Public   
@@ -21,8 +21,10 @@
 
 package com.motekew.vse.envrm;
 
+import com.motekew.vse.enums.DDX3D;
 import com.motekew.vse.enums.Basis3D;
 import com.motekew.vse.math.*;
+import com.motekew.vse.trmtm.Acceleration;
 
 /**
  * This class uses unnormalized zonal, sectorial, and tesseral coefficients
@@ -30,6 +32,8 @@ import com.motekew.vse.math.*;
  * non-spherical central body.  This allows one to compute the acceleration
  * acting on a body for dynamics related modeling, or to simply compute the
  * shape of an equipotential surface for visualization.
+ * <P>
+ * Computed acceleration is accessible via the IGetDDX3D interface.
  * <P>
  * One obvious use is the modeling of the Geoid.
  * <P>
@@ -59,6 +63,7 @@ import com.motekew.vse.math.*;
  *                       missing.  The summations were not supposed to be
  *                       deviations from spherical gravity, but the total
  *                       acceleration (when implemented correctly).
+ * @since    20131116    Satisfy IGetDDX3D interface.
  */
 public class Gravity implements ISpherical, IGravity {
   private final int degreeOrder;
@@ -68,6 +73,8 @@ public class Gravity implements ISpherical, IGravity {
   private double[][] slm = null;          // storage
   
   private LegendrePlmSinX aP = null;      // Associated Legendre Functions
+
+  private Acceleration accel = new Acceleration();  // Computed Acceleration
 
   /**
    * Initialize this gravity model with the gravitational parameter, reference
@@ -94,6 +101,16 @@ public class Gravity implements ISpherical, IGravity {
       // Degree numbers also start at zero
     degreeOrder = clm.length - 1;
     aP = new LegendrePlmSinX(degreeOrder);
+  }
+
+  /**
+   * @return   Acceleration components computed via gravt, relative to the
+   *           body.  X-axis runs through lat=lon=0.0, and the Z-axis runs
+   *           through lat = 90.
+   */
+  @Override
+  public double get(DDX3D ndx) {
+    return accel.get(ndx);
   }
 
   /**
@@ -196,8 +213,8 @@ public class Gravity implements ISpherical, IGravity {
    * as configured during instantation.
    */
   @Override
-  public void gravt(double r, double lat, double lon, Tuple3D accel) {
-    gravt(degreeOrder, r, lat, lon, accel);
+  public void gravt(double r, double lat, double lon) {
+    gravt(degreeOrder, r, lat, lon);
   }
 
   /**
@@ -209,18 +226,14 @@ public class Gravity implements ISpherical, IGravity {
    * @param   r        Distance from the centroid
    * @param   lat      Latitude:  -pi/2 <= ele <= pi/2  (rad)
    * @param   lon      Longitude: -pi   <= az  <= pi    (rad)
-   * @param   accel    Output:  Acceleration, relative to the body.  X-axis
-   *                   runs through lat=lon=0.0, and the Z-axis runs through
-   *                   lat = 90.
    */
   @Override
-  public void gravt(int degree, double r, double lat, double lon,
-                                                      Tuple3D accel) {
+  public void gravt(int degree, double r, double lat, double lon) {
     double slat = Math.sin(lat);
     double clat = Math.cos(lat);
 
     gravt(degree, r, slat, clat, lon,
-          r*clat*Math.cos(lon), r*clat*Math.sin(lon), r*slat, accel);
+          r*clat*Math.cos(lon), r*clat*Math.sin(lon), r*slat);
   }
 
   /**
@@ -228,23 +241,19 @@ public class Gravity implements ISpherical, IGravity {
    * as configured during instantation.
    */
   @Override
-  public void gravt(Tuple3D pos, Tuple3D accel) {
-    gravt(degreeOrder, pos, accel);
+  public void gravt(Tuple3D pos) {
+    gravt(degreeOrder, pos);
   }
 
   /**
    * This version of gravt accepts body relative Cartesian position as an
-   * input.  Otherwise, it is the same as gravt(degree, r, lat, lon, accel).
-   * Note that it is safe to use the same Tuple3D for the position vector
-   * as the output acceleration vector when calling this method (provided
-   * the calling method no longer needs the position vector it is passing in.
+   * input.  Otherwise, it is the same as gravt(degree, r, lat, lon).
    *
    * @param   degree   The degree and order of this model.
    * @param   pos      Position, body fixed, relative to the centroid.
-   * @param   accel    Output:  Acceleration, relative to the body centroid.
    */
   @Override
-  public void gravt(int degree, Tuple3D pos, Tuple3D accel) {
+  public void gravt(int degree, Tuple3D pos) {
     double r, rp2, slat, clat, lon;
     double rx = pos.get(Basis3D.I);
     double ry = pos.get(Basis3D.J);
@@ -257,11 +266,11 @@ public class Gravity implements ISpherical, IGravity {
     clat = Math.sqrt(rp2)/r;
     lon = Math.atan2(ry, rx);
 
-    gravt(degree, r, slat, clat, lon, rx, ry, rz, accel);
+    gravt(degree, r, slat, clat, lon, rx, ry, rz);
   }
 
   /**
-   * Returns the gravitational acceleration given inputs formatted from public
+   * Computes the gravitational acceleration given inputs formatted from public
    * gravt methods.
    *
    * @param   degree   The degree and order of this model.
@@ -272,12 +281,9 @@ public class Gravity implements ISpherical, IGravity {
    * @param   ri       X component of position vector
    * @param   rj       Y component of position vector
    * @param   rk       Z component of position vector
-   * @param   accel    Output:  Acceleration, relative to the body.  X-axis
-   *                   runs through lat=lon=0.0, and the Z-axis runs through
-   *                   lat = 90.
    */
   private void gravt(int degree, double r, double slat, double clat, double lon,
-                                 double ri, double rj, double rk, Tuple3D accel) {
+                                 double ri, double rj, double rk) {
     int ll, mm;               // Coefficient indices
     double reOverR = re/r;    // Earth radius of gravity model divided by r
     double gmOverR = gm/r;    // GM / r

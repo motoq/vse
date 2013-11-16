@@ -20,9 +20,11 @@
  */
 package com.motekew.vse.envrm;
 
+import com.motekew.vse.enums.DDX3D;
 import com.motekew.vse.intxm.IStepper;
 import com.motekew.vse.math.Quaternion;
 import com.motekew.vse.math.Tuple3D;
+import com.motekew.vse.trmtm.Acceleration;
 import com.motekew.vse.trmtm.RotatingBodySys;
 
 /**
@@ -49,6 +51,8 @@ public class RotatingCentralBody implements ICentralBody, IStepper {
   private RotatingBodySys rbs  = null;
   private Gravity grav = null;
 
+  Acceleration accel = new Acceleration();
+
   /**
    * Intialize with a <code>RotatingBodySys</code> to model the position
    * and attitude of this object, and a <code>Gravity</code> for central
@@ -60,6 +64,15 @@ public class RotatingCentralBody implements ICentralBody, IStepper {
   public RotatingCentralBody(RotatingBodySys rbs_in, Gravity g_in) {
     rbs  = rbs_in;
     grav = g_in;
+  }
+
+  /**
+   * @return   Acceleration components computed via gravt, relative to the
+   *           body.  See <code>Gravity</code>.
+   */
+  @Override
+  public double get(DDX3D ndx) {
+    return accel.get(ndx);
   }
 
   /**
@@ -117,33 +130,36 @@ public class RotatingCentralBody implements ICentralBody, IStepper {
    * Computes gravitational acceleration.  See <code>Gravity</code>.
    */
   @Override
-  public void gravt(double r, double lat, double lon, Tuple3D accel) {
-    grav.gravt(r, lat, lon, accel);
+  public void gravt(double r, double lat, double lon) {
+    grav.gravt(r, lat, lon);
+    accel.set(grav);
   }
 
   /**
    * Computes gravitational acceleration.  See <code>Gravity</code>.
    */
   @Override
-  public void gravt(int degree, double r, double lat, double lon,
-                                                   Tuple3D accel) {
-    grav.gravt(degree, r, lat, lon, accel);
+  public void gravt(int degree, double r, double lat, double lon) {
+    grav.gravt(degree, r, lat, lon);
+    accel.set(grav);
   }
 
   /**
    * Computes gravitational acceleration.  See <code>Gravity</code>.
    */  
   @Override
-  public void gravt(Tuple3D pos, Tuple3D accel) {
-    grav.gravt(pos, accel);
+  public void gravt(Tuple3D pos) {
+    grav.gravt(pos);
+    accel.set(grav);
   }
 
   /**
    * Computes gravitational acceleration.  See <code>Gravity</code>.
    */  
   @Override
-  public void gravt(int degree, Tuple3D pos, Tuple3D accel) {
-    grav.gravt(degree, pos, accel);
+  public void gravt(int degree, Tuple3D pos) {
+    grav.gravt(degree, pos);
+    accel.set(grav);
   }
 
   /**

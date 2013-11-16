@@ -21,16 +21,19 @@
 
 package com.motekew.vse.envrm;
 
+import com.motekew.vse.enums.IGetDDX3D;
 import com.motekew.vse.math.Tuple3D;
 
 /**
  * This interface defines the expected behavior of an object
- * modeling gravitational potential an acceleration.
+ * modeling gravitational potential an acceleration, accessible
+ * through the IGetDDX3D interface.
  * 
  *  @author  Kurt Motekew
  *  @since   20090330
+ *  @since   20131116  Implemented IGetDDX3D interface
  */
-public interface IGravity {
+public interface IGravity extends IGetDDX3D {
 
   /**
    * @return    Gravitational Parameter (distance_units^3/time_units^2)
@@ -78,11 +81,10 @@ public interface IGravity {
    * gravt without the option of specifying the degree/order to be
    * used.
    */
-  public void gravt(double r, double elevation, double azimuth,
-                                                Tuple3D accel);
+  public void gravt(double r, double elevation, double azimuth);
 
   /**
-   * Returns the gravitational acceleration given a position relative to the
+   * Generates the gravitational acceleration given a position relative to the
    * centroid of the body.  Input position is in spherical (radius, ele, az),
    * and output is in Cartesian (x, y, z).
    *
@@ -96,17 +98,13 @@ public interface IGravity {
    *                      -PI/2 and +PI/2.
    * @param   azimuth     Azimuth.  Once again, define range and what is
    *                      meant.  This could be a longitude.
-   * @param   accel       Output:  Acceleration, relative to the body.  X-axis
-   *                      runs through lat=lon=0.0, and the Z-axis runs through
-   *                      lat = 90.
    */
-  public void gravt(int degree, double r, double elevation, double azimuth,
-                                                            Tuple3D accel);
+  public void gravt(int degree, double r, double elevation, double azimuth);
 
   /**
    * gravt without the option of specifying the degree/order to be used.
    */
-  public void gravt(Tuple3D pos, Tuple3D accel);
+  public void gravt(Tuple3D pos);
 
   /**
    * This version of gravt accepts body relative Cartesian position as an
@@ -116,5 +114,5 @@ public interface IGravity {
    * @param   pos      Position relative to the centroid.
    * @param   accel    Output:  Acceleration, relative to the body centroid.
    */
-  public void gravt(int degree, Tuple3D pos, Tuple3D accel);
+  public void gravt(int degree, Tuple3D pos);
 }

@@ -22,7 +22,7 @@
 package com.motekew.vse.enums;
 
 /**
- * This enum represents position a three dimensional state.
+ * This enum represents position of a three dimensional state.
  *
  * @author Kurt Motekew
  * @since 20111111
