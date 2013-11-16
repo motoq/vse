@@ -269,7 +269,7 @@ public class Tuple extends VectorSpace {
    * Returns an array representation of this tuple.  The array will
    * have the same dimensions as the tuple.                        
    *
-   * @return      A double[] filled with this tuple's values.
+   * @return      A newly allocated double[] filled with this tuple's values.
    */
   public double[] values() {
     double[] tpl = new double[N];
@@ -295,10 +295,8 @@ public class Tuple extends VectorSpace {
    *                              
    * @param a     First Tuple
    * @param b     Second Tuple
-   *
-   * @return      Pointer to this (the resulting) vector
    */                           
-  public Tuple plus(Tuple a, Tuple b) {
+  public void plus(Tuple a, Tuple b) {
     if (N == a.N  &&  N == b.N) {
       double[] avals = a.valuesPtr();
       double[] bvals = b.valuesPtr();
@@ -309,7 +307,6 @@ public class Tuple extends VectorSpace {
       throw new VectorSpaceArgumentException("Tuple.add(Tuple a, Tuple b):  "
                                                   + "Dimensions must match.");
     }
-    return this;
   }
 
   /**
@@ -320,10 +317,8 @@ public class Tuple extends VectorSpace {
    * will be thrown.
    *                              
    * @param a     Tuple to add to this one
-   *
-   * @return      Pointer to this (the resulting) vector
    */                           
-  public Tuple plus(Tuple a) {
+  public void plus(Tuple a) {
     if (N == a.N) {
       double[] avals = a.valuesPtr();
       for (int ii=0; ii<N; ii++) {
@@ -333,7 +328,6 @@ public class Tuple extends VectorSpace {
       throw new VectorSpaceArgumentException("Tuple.add(Tuple a):  Dimensions "
                                               + "must match.");
     }
-    return this;
   }
 
   /**
@@ -345,10 +339,8 @@ public class Tuple extends VectorSpace {
    *                              
    * @param a     First Tuple
    * @param b     Second Tuple
-   *
-   * @return      Pointer to this (the resulting) vector
    */                           
-  public Tuple minus(Tuple a, Tuple b) {
+  public void minus(Tuple a, Tuple b) {
     if (N == a.N  &&  N == b.N) {
       double[] avals = a.valuesPtr();
       double[] bvals = b.valuesPtr();
@@ -359,7 +351,6 @@ public class Tuple extends VectorSpace {
       throw new VectorSpaceArgumentException("Tuple.subtr(Tuple a, Tuple b):  "
                                                   + "Dimensions must match.");
     }
-    return this;
   }
 
   /**
@@ -370,10 +361,8 @@ public class Tuple extends VectorSpace {
    * will be thrown.
    *                              
    * @param a     Tuple to subtract from this one
-   *
-   * @return      Pointer to this (the resulting) vector
    */                           
-  public Tuple minus(Tuple a) {
+  public void minus(Tuple a) {
     if (N == a.N) {
       double[] avals = a.valuesPtr();
       for (int ii=0; ii<N; ii++) {
@@ -383,7 +372,6 @@ public class Tuple extends VectorSpace {
       throw new VectorSpaceArgumentException("Tuple.subtr(Tuple a):  " +
                                                    "Dimensions must match.");
     }
-    return this;
   }
 
   /**
@@ -391,14 +379,11 @@ public class Tuple extends VectorSpace {
    * product of itself and the input scalar.                     
    *                                        
    * @param  s     Scalar to multiply this Tuple by
-   *
-   * @return       Pointer to this (the resulting) vector
    */
-  public Tuple mult(double s) {
+  public void mult(double s) {
     for (int ii=0; ii<N; ii++) {
       vals[ii] *= s;
     }
-    return this;
   }
 
   /**
@@ -406,13 +391,9 @@ public class Tuple extends VectorSpace {
    * product of itself and the inverse of the input scalar.
    *                                        
    * @param  s     Scalar to divide this Tuple by
-   *
-   * @return       Pointer to this (the resulting) vector
    */
-  public Tuple div(double s) {
+  public void div(double s) {
     mult(1.0/s);
-
-    return this;
   }
 
   /**
@@ -426,10 +407,8 @@ public class Tuple extends VectorSpace {
    *
    * @param  mtr     Matrix [MXN]
    * @param  tpl     Tuple  [MX1]
-   *
-   * @return         Pointer to this (the resulting) vector
    */
-  public Tuple mult(Matrix mtr, Tuple tpl) {
+  public void mult(Matrix mtr, Tuple tpl) {
     int ii, jj;
 
       // Check dimension
@@ -446,8 +425,6 @@ public class Tuple extends VectorSpace {
       throw new VectorSpaceArgumentException("Dimensions for" +
                                    "Matrix * Tuple don't match");
     }
-
-    return this;
   }
 
   /**

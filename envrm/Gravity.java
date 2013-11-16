@@ -210,7 +210,12 @@ public class Gravity implements ISpherical, IGravity {
 
   /**
    * this.gravt() with the degree and order set to the maximum allowable,
-   * as configured during instantation.
+   * as configured during instantation.  Access resulting acceleration via
+   * the IGetDDX3D interface
+   *
+   * @param   r        Distance from the centroid
+   * @param   lat      Latitude:  -pi/2 <= ele <= pi/2  (rad)
+   * @param   lon      Longitude: -pi   <= az  <= pi    (rad)
    */
   @Override
   public void gravt(double r, double lat, double lon) {
@@ -218,9 +223,10 @@ public class Gravity implements ISpherical, IGravity {
   }
 
   /**
-   * Returns the gravitational acceleration given a position relative to the
+   * Computes the gravitational acceleration given a position relative to the
    * centroid of the body.  Input position is in spherical (lat, lon, radius),
-   * and output is in Cartesian (x, y, z).
+   * and output is in Cartesian (x, y, z).  Access resulting acceleration via
+   * the IGetDDX3D interface.
    *
    * @param   degree   The degree and order of this model.
    * @param   r        Distance from the centroid
@@ -238,7 +244,10 @@ public class Gravity implements ISpherical, IGravity {
 
   /**
    * this.gravt with the degree and order set to the maximum allowable,
-   * as configured during instantation.
+   * as configured during instantation.  Access resulting acceleration via
+   * the IGetDDX3D interface.
+   *
+   * param   pos      Position, body fixed, relative to the centroid.
    */
   @Override
   public void gravt(Tuple3D pos) {
@@ -248,6 +257,7 @@ public class Gravity implements ISpherical, IGravity {
   /**
    * This version of gravt accepts body relative Cartesian position as an
    * input.  Otherwise, it is the same as gravt(degree, r, lat, lon).
+   * Access resulting acceleration via the IGetDDX3D interface.
    *
    * @param   degree   The degree and order of this model.
    * @param   pos      Position, body fixed, relative to the centroid.
@@ -271,7 +281,7 @@ public class Gravity implements ISpherical, IGravity {
 
   /**
    * Computes the gravitational acceleration given inputs formatted from public
-   * gravt methods.
+   * gravt methods.  Results stored in accel variable.
    *
    * @param   degree   The degree and order of this model.
    * @param   r        Distance from the centroid

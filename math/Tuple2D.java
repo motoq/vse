@@ -163,29 +163,12 @@ public class Tuple2D extends Tuple {
     return super.get(2);
   }
 
-  /**
-   * Generates a Tuple3D unit vector using the first and 2nd
-   * components of this Tuple2D.  If this Tuple2D is already
-   * larger than 1 in magnitude, then an exception will be
-   * thrown (doing nothing could result in a hard to find bug -
-   * better to have the system complain with a runtime exception).
-   * Note the sign from the last call to set(Tuple3D) is preserved.
-   *
-   * @param   uvec    Output:  Unit vector derived from this
-   *                  Tuple2D
-   *
-   * @throws         If this vector has a magnitude greater than 1.
+  /** 
+   * @return  The sign to be assigned to a 3rd element when converting
+   *          this 2D tuple to a 3D one.  Defaults to +1.
    */
-  public Tuple3D getUnitVec(Tuple3D uvec) {
-    double w2 = 1.0 - this.dot(this);
-
-    if (w2 < 0.0) {
-      throw new VectorSpaceArgumentException(
-        "Magnitude of input Tuple2D must be <= 1:  " + this);      
-    } else {
-      uvec.set(getU(), getV(), wSign*Math.sqrt(w2));
-    }
-    return uvec;
+  double getWSign() {
+    return wSign;
   }
 
   /**

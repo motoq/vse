@@ -177,18 +177,14 @@ public class Tuple3D extends Tuple implements IGetBasis3D {
    *
    * @param a     First Tuple3D
    * @param b     Second Tuple3D
-   * 
-   * @return      Pointer to this (the resulting) vector
    */
-  public Tuple3D plus(Tuple3D a, Tuple3D b) {
+  public void plus(Tuple3D a, Tuple3D b) {
     double[] aptr = a.valuesPtr();
     double[] bptr = b.valuesPtr();
 
     vals[0] = aptr[0] + bptr[0];
     vals[1] = aptr[1] + bptr[1];
     vals[2] = aptr[2] + bptr[2];
-
-    return this;
   }
 
   /**
@@ -196,17 +192,13 @@ public class Tuple3D extends Tuple implements IGetBasis3D {
    * sum of itself and the input tuple:  this = this + a
    *
    * @param a     Tuple to add to this one
-   * 
-   * @return      Pointer to this (the resulting) vector
    */
-  public Tuple3D plus(Tuple3D a) {
+  public void plus(Tuple3D a) {
     double[] aptr = a.valuesPtr();
 
     vals[0] += aptr[0];
     vals[1] += aptr[1];
     vals[2] += aptr[2];
-
-    return this;
   }
 
   /**
@@ -215,18 +207,14 @@ public class Tuple3D extends Tuple implements IGetBasis3D {
    *
    * @param a     First Tuple3D
    * @param b     Second Tuple3D
-   * 
-   * @return      Pointer to this (the resulting) vector
    */
-  public Tuple3D minus(Tuple3D a, Tuple3D b) {
+  public void minus(Tuple3D a, Tuple3D b) {
     double[] aptr = a.valuesPtr();
     double[] bptr = b.valuesPtr();
 
     vals[0] = aptr[0] - bptr[0];
     vals[1] = aptr[1] - bptr[1];
     vals[2] = aptr[2] - bptr[2];
-
-    return this;
   }
 
   /**
@@ -234,17 +222,13 @@ public class Tuple3D extends Tuple implements IGetBasis3D {
    * difference of this and a:  this = this - a
    *
    * @param a     Tuple to subtract from this one
-   * 
-   * @return      Pointer to this (the resulting) vector
    */
-  public Tuple3D minus(Tuple3D a) {
+  public void minus(Tuple3D a) {
     double[] aptr = a.valuesPtr();
 
     vals[0] -= aptr[0];
     vals[1] -= aptr[1];
     vals[2] -= aptr[2];
-
-    return this;
   }
 
   /**
@@ -253,18 +237,14 @@ public class Tuple3D extends Tuple implements IGetBasis3D {
    *
    * @param a     First Tuple3D (aXb)
    * @param b     Second Tuple3D (aXb)
-   * 
-   * @return      Pointer to this (the resulting) vector
    */
-  public Tuple3D cross(Tuple3D a, Tuple3D b) {
+  public void cross(Tuple3D a, Tuple3D b) {
     double[] aptr = a.valuesPtr();
     double[] bptr = b.valuesPtr();
 
     vals[0] = aptr[1]*bptr[2] - aptr[2]*bptr[1];
     vals[1] = aptr[2]*bptr[0] - aptr[0]*bptr[2];
     vals[2] = aptr[0]*bptr[1] - aptr[1]*bptr[0];
-
-    return this;
   }
 
   /**
@@ -354,15 +334,11 @@ public class Tuple3D extends Tuple implements IGetBasis3D {
    * product of itself and the input scalar.
    *
    * @param  s     Scalar to multiply this Tuple3D by
-   * 
-   * @return       Pointer to this (the resulting) vector
    */
-  public Tuple3D mult(double s) {
+  public void mult(double s) {
     vals[0] *= s;
     vals[1] *= s;
     vals[2] *= s;
-
-    return this;
   }
 
   /**
@@ -370,13 +346,9 @@ public class Tuple3D extends Tuple implements IGetBasis3D {
    * product of itself and the inverse of the input scalar.
    *
    * @param  s     Scalar to divide this Tuple3D by
-   *
-   * @return       Pointer to this (the resulting) vector
    */
-  public Tuple3D div(double s) {
+  public void div(double s) {
     mult(1.0/s);
-
-    return this;
   }
 
   /**
@@ -406,6 +378,29 @@ public class Tuple3D extends Tuple implements IGetBasis3D {
    */
   public void unitize() {
     this.mult(1.0/this.mag());
+  }
+ 
+  /**
+   * Generates a Tuple3D unit vector using the first and 2nd
+   * components of the input Tuple2D.  If the Tuple2D is already
+   * larger than 1 in magnitude, then an exception will be
+   * thrown (doing nothing could result in a hard to find bug -
+   * better to have the system complain with a runtime exception).
+   * Note the sign from the last call to set(Tuple3D) is preserved.
+   *
+   * @param   uv      2D vector from which to derive a 3D unit vector.
+   *
+   * @throws         If this vector has a magnitude greater than 1.
+   */
+  public void setUnitVec(Tuple2D uv) {
+    double w2 = 1.0 - uv.dot(uv);
+
+    if (w2 < 0.0) {
+      throw new VectorSpaceArgumentException(
+        "Magnitude of input Tuple2D must be <= 1:  " + uv);      
+    } else {
+      set(uv.getU(), uv.getV(), uv.getWSign()*Math.sqrt(w2));
+    }
   }
 
   /**
