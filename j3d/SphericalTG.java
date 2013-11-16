@@ -91,17 +91,16 @@ public class SphericalTG extends TransformGroup {
     setCapability(TransformGroup.ALLOW_TRANSFORM_READ);
     setCapability(TransformGroup.ALLOW_TRANSFORM_WRITE);
 
-    Tuple3D xyz = new Tuple3D();
-    SphericalUtil spu = new SphericalUtil();  // Take advantage of el cache
+    SphereCart xyz = new SphereCart();        // Take advantage of el cache
 
       // Only need one point at these locations.  Handle first and last el
       // bands with TriangleArrays, not QuadArrays.  Scale coordinates.
     el = Math.PI/2.0;
     az = 0.0;
-    sFunct.getXYZ(el, az, xyz);
+    xyz.setRElAz(1.0, el, az);
     Point3d northPole = new Point3d(0.0, 0.0, scale*xyz.get(Basis3D.K));
     el = -Math.PI/2.0;
-    sFunct.getXYZ(el, az, xyz);
+    xyz.setRElAz(1.0, el, az);
     Point3d southPole = new Point3d(0.0, 0.0, scale*xyz.get(Basis3D.K));
 
     /*
@@ -138,10 +137,10 @@ public class SphericalTG extends TransformGroup {
     for (ii=0; ii<nElBands; ii++) {            // -1 here
         // make next parallel.  Started at north pole, work down....
       el -= delta;
-      spu.setElevation(el);
+      xyz.setElevation(el);
       for (jj=0; jj<nAzBands; jj++) {
         radius = scale*sFunct.getR(el, az);
-        spu.rLatLon2xyz(radius, az, xyz);
+        xyz.setRadiusAzimuth(radius, az);
         parallels[1][jj].x = xyz.get(Basis3D.I);
         parallels[1][jj].y = xyz.get(Basis3D.J);
         parallels[1][jj].z = xyz.get(Basis3D.K);

@@ -1,7 +1,7 @@
 /*
  c  ISpherical.java
  c
- c  Copyright (C) 2000, 2009 Kurt Motekew
+ c  Copyright (C) 2000, 2013 Kurt Motekew
  c
  c  This library is free software; you can redistribute it and/or
  c  modify it under the terms of the GNU Lesser General Public   
@@ -47,16 +47,4 @@ public interface ISpherical {
    */
   public double getR(double elevation, double azimuth);
 
-  /**
-   * Creates vector in Cartesian coordinates from elevation and azimuth.
-   * 
-   * @param   elevation   Elevation, as defined above.
-   * @param   azimuth     Azimuth, as defined above.
-   * @param   xyz         X, Y, and Z coordinates.  Most likely computed
-   *                      by first finding the radius, and then converting
-   *                      to Cartesian.  Uses a conversion method that is
-   *                      consistent with the definition of elevation and
-   *                      azimuth in this class.
-   */
-  public void getXYZ(double elevation, double azimuth, Tuple3D xyz);
 }

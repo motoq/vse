@@ -63,7 +63,7 @@ public class TestGravt {
     SphericalHarmonicCoeff shc = new SphericalHarmonicCoeff(false, clM.values(), slM.values());
     Gravity geo = new Gravity(gm, 1.0, shc);
     
-    Tuple3D pos = new Tuple3D();
+    SphereCart pos = new SphereCart();
     double r  = 1.5;
     Tuple3D accel = new Tuple3D();
     double lat;
@@ -79,7 +79,7 @@ public class TestGravt {
       System.out.println("Lat = "   + Math.toDegrees(lat) + 
                        "\tLon = "   + Math.toDegrees(lon) +
                        "\tAccel:  " + accel);
-      SphericalUtil.rLatLon2xyz(r, lat, lon, pos);
+      pos.setRElAz(r, lat, lon);
       geo.gravt(ii, pos, accel);
       System.out.println("Lat = "   + Math.toDegrees(lat) + 
                        "\tLon = "   + Math.toDegrees(lon) +
@@ -92,7 +92,7 @@ public class TestGravt {
       System.out.println("Lat = "   + Math.toDegrees(lat) + 
                        "\tLon = "   + Math.toDegrees(lon) +
                        "\tAccel:  " + accel);
-      SphericalUtil.rLatLon2xyz(r, lat, lon, pos);
+      pos.setRElAz(r, lat, lon);
       geo.gravt(ii, pos, accel);
       System.out.println("Lat = "   + Math.toDegrees(lat) + 
                        "\tLon = "   + Math.toDegrees(lon) +

@@ -192,24 +192,6 @@ public class Gravity implements ISpherical, IGravity {
   }
 
   /**
-   * The same as getR, but instead returns Cartesian coordinates defined
-   * by the input lat, lon, and computed potential value (which is treated
-   * as a radius).
-   * 
-   * @param   lat      Latitude:  -pi/2 <= ele <= pi/2  (rad)
-   * @param   lon      Longitude: -pi   <= az  <= pi    (rad)
-   * @param   xyz      X, Y, and Z coordinates computed from the entered
-   *                   lat, lon, and the return value from getR().  Can
-   *                   be used to build a visual representation of the
-   *                   potential.
-   */
-  @Override
-  public void getXYZ(double lat, double lon, Tuple3D xyz) {
-    double radius = this.getR(lat, lon);
-    SphericalUtil.rLatLon2xyz(radius, lat, lon, xyz);
-  }
-
-  /**
    * this.gravt() with the degree and order set to the maximum allowable,
    * as configured during instantation.
    */

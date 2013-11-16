@@ -114,14 +114,6 @@ public class RotatingCentralBody implements ICentralBody, IStepper {
   }
 
   /**
-   * Computes gravitational potential - see <code>Gravity</code>
-   */  
-  @Override
-  public void getXYZ(double lat, double lon, Tuple3D xyz) {
-    grav.getXYZ(lat, lon, xyz);
-  }
-
-  /**
    * Computes gravitational acceleration.  See <code>Gravity</code>.
    */
   @Override
