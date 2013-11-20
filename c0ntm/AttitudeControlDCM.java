@@ -21,14 +21,13 @@
 
 package com.motekew.vse.c0ntm;
 
-import com.motekew.vse.enums.Basis3D;
 import com.motekew.vse.math.Matrix3X3;
 import com.motekew.vse.math.Quaternion;
 import com.motekew.vse.math.Tuple3D;
 
 /**
- * This class is an attitude feedback controller with the the
- * following control law:
+ * This <code>Tuple3D</code> is an attitude feedback controller with
+ * the the following control law (where 'u' is this Tuple3D):
  * <P>
  *   {u} = -[Kv]*{w} - [Kp]*{OmegaA([R])}
  * <P>
@@ -44,7 +43,7 @@ import com.motekew.vse.math.Tuple3D;
  * multiplying the current attitude DCM by the transpose of the desired
  * DCM (as implemented below) makes more sense for either case.
  * <P>
- * uvec is the resulting vector of torques about three axes at a given
+ * 'this' is the resulting vector of torques about three axes at a given
  * moment with the objective of transforming the attitude of the object
  * being modeled from its current state to a desired one.  The resulting
  * torques are derived from the sum of a kinetic and potential contribution.
@@ -74,16 +73,16 @@ import com.motekew.vse.math.Tuple3D;
  * damped).  
  * <P>
  * More info on inputs can be found in the documentation for each
- * respective "set()" method below.
+ * respective "control()" method below.
  * <P>
  * This class is not thread safe.
  * 
  * @author  Kurt Motekew
  * @since   20110609
- * @since   20131109   Implemented IAttitudeControl interface
+ * @since   20131112   Implemented IAttitudeControl interface and extended
+ *                     Tuple3D class.
  */
-public class AttitudeControlDCM implements IAttitudeControl {
-  private Tuple3D uvec = new Tuple3D();
+public class AttitudeControlDCM extends Tuple3D implements IAttitudeControl {
 
     // Default gain values to null -> control provides no outpt
   private Matrix3X3 kv = null;                      // potential gain
@@ -117,19 +116,6 @@ public class AttitudeControlDCM implements IAttitudeControl {
    * default, resulting in no control outputs.
    */
   public AttitudeControlDCM() {
-  }
-
-  @Override
-  /**
-   * Retrieves attitude aontrol torques based on previously called
-   * set() method.
-   *
-   * return    Torque about desired [X, Y, Z]' axes, in units consistent
-   *           with the call to computeU.  These are the control vector
-   *           values.
-   */
-  public double get(Basis3D ndx) {
-    return uvec.get(ndx);
   }
 
   /**
@@ -216,18 +202,18 @@ public class AttitudeControlDCM implements IAttitudeControl {
    *                       relative to the body frame.  rad/time_unit
    */
   @Override
-  public void set(Tuple3D wvec) {
+  public void control(Tuple3D wvec) {
       // Compute kinetic part if gain matrix has been set.  Make sure
       // to zero return vector just in case it isn't set.
-    uvec.zero();
+    zero();
     if (kv != null) {
-      uvec.mult(kv, wvec);   // Reuse omegaA for kinetic contribution
-      uvec.mult(-1.0);
+      mult(kv, wvec);   // Reuse omegaA for kinetic contribution
+      mult(-1.0);
     }
   }
 
   /**
-   * Same as set() below, except with quaternion attitudes (current
+   * Same as control() below, except with quaternion attitudes (current
    * and desired) as inputs.
    *
    * @param   currentAtt   Current inertial attitude quaternion
@@ -236,16 +222,16 @@ public class AttitudeControlDCM implements IAttitudeControl {
    *                       relative to the body frame.  rad/time_unit
    */
   @Override
-  public void set(Quaternion currentAtt, Quaternion desiredAtt,
-                                                  Tuple3D wvec) {
+  public void control(Quaternion currentAtt, Quaternion desiredAtt,
+                                                      Tuple3D wvec) {
       // Simply convert current and desired attitudes to DCMs, then pass along.
     cntQC.currentAtt.set(currentAtt);
     cntQC.desiredAtt.set(desiredAtt);
-    set(cntQC.currentAtt, cntQC.desiredAtt, wvec);
+    control(cntQC.currentAtt, cntQC.desiredAtt, wvec);
   }
 
   /**
-   * Same as set() below, except with current attitude as a quaternion
+   * Same as control() below, except with current attitude as a quaternion
    * and desired as a DCM.
    *
    * @param   currentAtt   Current inertial attitude quaternion
@@ -254,11 +240,11 @@ public class AttitudeControlDCM implements IAttitudeControl {
    *                       relative to the body frame.  rad/time_unit
    */
   @Override
-  public void set(Quaternion currentAtt, Matrix3X3 desiredAtt,
-                                                      Tuple3D wvec) {
+  public void control(Quaternion currentAtt, Matrix3X3 desiredAtt,
+                                                     Tuple3D wvec) {
       // Simply convert current and desired attitudes to DCMs, then pass along.
     cntQC.currentAtt.set(currentAtt);
-    set(cntQC.currentAtt, desiredAtt, wvec);
+    control(cntQC.currentAtt, desiredAtt, wvec);
   }
 
   /**
@@ -275,15 +261,15 @@ public class AttitudeControlDCM implements IAttitudeControl {
    *                       relative to the body frame.  rad/time_unit
    */
   @Override
-  public void set(Matrix3X3 currentAtt, Matrix3X3 desiredAtt,
-                                                     Tuple3D wvec) {
+  public void control(Matrix3X3 currentAtt, Matrix3X3 desiredAtt,
+                                                    Tuple3D wvec) {
       // Compute kinetic portion and add to potential below
-    set(wvec);
+    control(wvec);
     cntC.uvec_k.set(this);
-    uvec.zero();
+    zero();
 
       // Compute potential part if gain matrix has been set
-    if (kp != null) {     
+    if (kp != null) {
         // Working:  Rotate desired about x-axis by 180 deg.
       cntC.desiredAttT.mult(cntC.rotX180, desiredAtt);
         // Mult current by desired_Transposed
@@ -297,11 +283,11 @@ public class AttitudeControlDCM implements IAttitudeControl {
       cntC.omegaA.put(3, ai.get(1) * cntC.deltaAtt.get(2,1) -
                          ai.get(2) * cntC.deltaAtt.get(1,2)   );
 
-      uvec.mult(kp, cntC.omegaA);
-      uvec.mult(-1.0);
+      mult(kp, cntC.omegaA);
+      mult(-1.0);
     }
 
       // kinetic and potential contribution
-    uvec.plus(cntC.uvec_k);
+    plus(cntC.uvec_k);
   }
 }

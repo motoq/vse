@@ -27,7 +27,7 @@ import com.motekew.vse.math.Matrix3X3;
 import com.motekew.vse.math.Quaternion;
 
 /**
- * Defines an interface that computes and returns torques about axes
+ * Defines an interface that computes torques about axes
  * given a current and desired attitude criteria.
  *
  * @author   Kurt Motekew
@@ -36,18 +36,18 @@ import com.motekew.vse.math.Quaternion;
 public interface IAttitudeControl extends IGetBasis3D {
 
   /** Zero attitude rates method */
-  public void set(Tuple3D wvec);
+  public void control(Tuple3D wvec);
 
   /** Current and desired attitudes expressed as Quaternions */
-  public void set(Quaternion currentAtt, Quaternion desiredAtt,
-                                                  Tuple3D wvec);
+  public void control(Quaternion currentAtt, Quaternion desiredAtt,
+                                                      Tuple3D wvec);
 
   /** Current attitude as a quaternion and desired as a matrix */
-  public void set(Quaternion currentAtt, Matrix3X3 desiredAtt,
-                                                 Tuple3D wvec);
+  public void control(Quaternion currentAtt, Matrix3X3 desiredAtt,
+                                                     Tuple3D wvec);
 
   /** Current and desired attitude expressed as matrices */
-  public void set(Matrix3X3 currentAtt, Matrix3X3 desiredAtt,
-                                                     Tuple3D wvec);
+  public void control(Matrix3X3 currentAtt, Matrix3X3 desiredAtt,
+                                                    Tuple3D wvec);
 
 }
