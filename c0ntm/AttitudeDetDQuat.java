@@ -26,10 +26,9 @@ import com.motekew.vse.math.*;
 import com.motekew.vse.sensm.*;
 
 /**
- * This class handles attitude determination given unit pointing vectors
+ * This Quaternion estimates attitude given unit pointing vectors
  * to known reference points and pointing vectors measured from sensors.
- * It requires at least two measurements to work.  The estimated attitude
- * is accessed via the <code>IGetQ</code> interface
+ * It requires at least two measurements to work.
  * <P>
  * It is based of a method presented in "A Gyro-Free Quaternion-Based
  * Attitude Determination System Suitable for Implementation Using Low
@@ -50,30 +49,16 @@ import com.motekew.vse.sensm.*;
  *
  * @author   Kurt Motekew
  * @since    20121011
- * @since    20131109  modified to use IGetQ interface
+ * @since    20131109  modified to extend the Quaternion class
  */
-public class AttitudeDetDQuat implements IGetQ {
+public class AttitudeDetDQuat extends Quaternion {
   public static final int NY = 2;        // Number of measurements per set    
   public static final int NP = 3;        // Number of solve for parameters
 
   private int maxitr = 50;
   private double tol = .0005;
 
-  private Quaternion qAtt = new Quaternion();
   private AttitudeDetTRIAD attInit = new AttitudeDetTRIAD();
-
-  /**
-   * Gets the component values the solved for attitude quaternion.
-   *
-   * @param  ndx   A <code>Q<code> indicating which component to
-   *               retrieve.
-   *
-   * @return      The double value representing the requested component
-   */
-  @Override
-  public double get(Q ndx) {
-    return qAtt.get(ndx);
-  }
 
   /**
    * Estimates attitude of a body given pointing vectors supplied by
@@ -129,7 +114,7 @@ public class AttitudeDetDQuat implements IGetQ {
     double sii, sjj, wii, wjj;
 
     attInit.set(sensors);
-    qAtt.set(attInit);
+    set(attInit);
     int nMeas;
     for (nitr=1; nitr<maxitr; nitr++) {
       ss.reset();
@@ -154,7 +139,7 @@ public class AttitudeDetDQuat implements IGetQ {
         for (int kk=0; kk<nMeas; kk++) {
           // Known/modeled location
           sensors[jj].getReferencePointing(kk, xyz);
-          xyz_b.fRot(qAtt, xyz);
+          xyz_b.fRot(this, xyz);
           xyz_s.fRot(qb2s, xyz_b);
           sensors[jj].getPointing(kk, uv);
             // True vs. computed measurement:  residual
@@ -176,9 +161,9 @@ public class AttitudeDetDQuat implements IGetQ {
       qe.put(Q.QI, qe_vec.get(Basis3D.I));
       qe.put(Q.QJ, qe_vec.get(Basis3D.J));
       qe.put(Q.QK, qe_vec.get(Basis3D.K));
-      qtmp.set(qAtt);
-      qAtt.mult(qtmp, qe);
-      qAtt.normalize();
+      qtmp.set(this);
+      mult(qtmp, qe);
+      normalize();
       if (qe_vec.mag() < tol) {     
         break;
       }

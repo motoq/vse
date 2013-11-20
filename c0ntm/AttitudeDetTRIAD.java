@@ -21,40 +21,22 @@
 
 package com.motekew.vse.c0ntm;
 
-import com.motekew.vse.enums.IGetQ;
-import com.motekew.vse.enums.Q;
 import com.motekew.vse.math.*;
 import com.motekew.vse.sensm.IPointingObsModeled;
 
 /**
- * This class makes use of the TRIAD algorithm to determine the
+ * This Quaternion makes use of the TRIAD algorithm to determine the
  * transformation from a known reference frame to another given
  * two sets of unit pointing vectors in the known frame and two
  * sets in the frame to be determined.  See AIAA 81-4003, "Three-Axis
  * Attitude Determination from Vector Observations", M.D. Shuster and
- * S.D. Oh.  The estimated attitude is accessed via the
- * <code>IGetQ</code> interface
+ * S.D. Oh.
  *
  * @author   Kurt Motekew
  * @since    20120924
- * @since    20131109  modified to use IGetQ interface
+ * @since    20131109  modified to extend the Quaternion class
  */
-public class AttitudeDetTRIAD implements IGetQ {
-
-  private Quaternion qAtt = new Quaternion();
-
-  /**
-   * Gets the component values the solved for attitude quaternion.
-   *
-   * @param  ndx   A <code>Q<code> indicating which component to
-   *               retrieve.
-   *
-   * @return      The double value representing the requested component
-   */
-  @Override
-  public double get(Q ndx) {
-    return qAtt.get(ndx);
-  }
+public class AttitudeDetTRIAD extends Quaternion {
 
   /**
    * Determine the Quaternion transforming known pointing vectors in reference
@@ -71,7 +53,7 @@ public class AttitudeDetTRIAD implements IGetQ {
   public int set(IPointingObsModeled[] sensors) {
     Matrix3X3 mat = new Matrix3X3();
     int nitr =  estimateAtt(sensors, mat);
-    qAtt.set(mat);
+    set(mat);
     return nitr;
   }
 

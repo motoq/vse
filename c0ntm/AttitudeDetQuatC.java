@@ -21,16 +21,14 @@
 
 package com.motekew.vse.c0ntm;
 
-import com.motekew.vse.enums.IGetQ;
 import com.motekew.vse.enums.Q;
 import com.motekew.vse.math.*;
 import com.motekew.vse.sensm.*;
 
 /**
- * This class handles attitude determination given unit pointing vectors
+ * This Quaternion estimates attitude given unit pointing vectors
  * to known reference points and pointing vectors measured from sensors.
- * It requires at least two measurements to work.  The estimated attitude
- * is accessed via the <code>IGetQ</code> interface
+ * It requires at least two measurements to work.
  * <P>
  * A very simple WLS solution is implemented.  The measurement errors
  * between each set are considered independent from each other.  Similarly,
@@ -46,9 +44,9 @@ import com.motekew.vse.sensm.*;
  *
  * @author   Kurt Motekew
  * @since    20130921
- * @since    20131109  modified to use IGetQ interface
+ * @since    20131109  modified to extend the Quaternion class
  */
-public class AttitudeDetQuatC implements IGetQ {
+public class AttitudeDetQuatC extends Quaternion {
   public static final int NY = 2;        // Number of measurements per set    
   public static final int NP = 3;        // Number of solve for parameters
 
@@ -56,7 +54,6 @@ public class AttitudeDetQuatC implements IGetQ {
   private double tol = .000005;          // Note tolerance can be smaller than
                                          // AttitudeDetQuat
 
-  private Quaternion qAtt = new Quaternion();
   private AttitudeDetTRIAD attInit = new AttitudeDetTRIAD();
   private SysSolverBD ss = new SysSolverBD(NY, NP);
   private Matrix qCov;
@@ -67,19 +64,6 @@ public class AttitudeDetQuatC implements IGetQ {
    */
   public AttitudeDetQuatC() {
     qCov = ss.emptyCovariance();
-  }
-
-  /**
-   * Gets the component values the solved for attitude quaternion.
-   *
-   * @param  ndx   A <code>Q<code> indicating which component to
-   *               retrieve.
-   *
-   * @return      The double value representing the requested component
-   */
-  @Override
-  public double get(Q ndx) {
-    return qAtt.get(ndx);
   }
 
   /**
@@ -138,11 +122,11 @@ public class AttitudeDetQuatC implements IGetQ {
 
       // Use a deterministic method for the first guess
     attInit.set(sensors);
-    qAtt.set(attInit);
-    qAtt.standardize();
-    phat.put(1, qAtt.get(Q.QI));
-    phat.put(2, qAtt.get(Q.QJ));
-    phat.put(3, qAtt.get(Q.QK));
+    set(attInit);
+    standardize();
+    phat.put(1, get(Q.QI));
+    phat.put(2, get(Q.QJ));
+    phat.put(3, get(Q.QK));
     int nMeas;
     for (nitr=1; nitr<maxitr; nitr++) {
       ss.reset();
@@ -170,13 +154,13 @@ public class AttitudeDetQuatC implements IGetQ {
             // Actual Measurement
           sensors[jj].getPointing(kk, uv);
             // Computed measurement, y
-          ycb.fRot(qAtt, xyz);
+          ycb.fRot(this, xyz);
           ycs.fRot(qb2s, ycb);
           yc.set(ycs, 1);
             // Residual 
           r.minus(uv, yc);
             // Normal equations
-          a.partials(xyz, qb2s, qAtt);
+          a.partials(xyz, qb2s, this);
           ss.accumulate(a, w, r);   
         }
       }
@@ -200,7 +184,7 @@ public class AttitudeDetQuatC implements IGetQ {
       qj = phat.get(2);
       qk = phat.get(3);
       qs = Math.sqrt(1.0 - qi*qi - qj*qj - qk*qk);
-      qAtt.set(qs, qi, qj, qk);
+      set(qs, qi, qj, qk);
       if (dpnew < tol  &&  dpnew <= dpold) {     
         break;
       }

@@ -21,16 +21,13 @@
 
 package com.motekew.vse.c0ntm;
 
-import com.motekew.vse.enums.IGetQ;
-import com.motekew.vse.enums.Q;
 import com.motekew.vse.math.*;
 import com.motekew.vse.sensm.*;
 
 /**
- * This class handles attitude determination given unit pointing vectors
+ * This Quaternion estimates attitude given unit pointing vectors
  * to known reference points and pointing vectors measured from sensors.
- * It requires at least two measurements to work.  The estimated attitude
- * is accessed via the <code>IGetQ</code> interface
+ * It requires at least two measurements to work.
  * <P>
  * A very simple WLS solution is implemented.  The measurement errors
  * between each set are considered independent from each other.  Similarly,
@@ -53,16 +50,15 @@ import com.motekew.vse.sensm.*;
  *
  * @author   Kurt Motekew
  * @since    20120913
- * @since    20131109  modified to use IGetQ interface
+ * @since    20131109  modified to extend the Quaternion class
  */
-public class AttitudeDetQuat implements IGetQ {
+public class AttitudeDetQuat extends Quaternion {
   public static final int NY = 2;        // Number of measurements per set    
   public static final int NP = 4;        // Number of solve for parameters
 
   private int maxitr = 50;
   private double tol = .00005;
 
-  private Quaternion qAtt = new Quaternion();
   private AttitudeDetTRIAD attInit = new AttitudeDetTRIAD();
   private SysSolverBD ss = new SysSolverBD(NY, NP);
   private Matrix qCov;
@@ -73,19 +69,6 @@ public class AttitudeDetQuat implements IGetQ {
    */
   public AttitudeDetQuat() {
     qCov = ss.emptyCovariance();
-  }
-
-  /**
-   * Gets the component values the solved for attitude quaternion.
-   *
-   * @param  ndx   A <code>Q<code> indicating which component to
-   *               retrieve.
-   *
-   * @return      The double value representing the requested component
-   */
-  @Override
-  public double get(Q ndx) {
-    return qAtt.get(ndx);
   }
 
   /**
@@ -148,9 +131,9 @@ public class AttitudeDetQuat implements IGetQ {
       // work better with 2 measurements, or when the measurements are
       // extra noisy.
     attInit.set(sensors);
-    qAtt.set(attInit);
-    qAtt.standardize();
-    phat.set(1, qAtt);
+    set(attInit);
+    standardize();
+    phat.set(1, this);
     int nMeas;
     for (nitr=1; nitr<maxitr; nitr++) {
       ss.reset();
@@ -178,13 +161,13 @@ public class AttitudeDetQuat implements IGetQ {
             // Actual Measurement
           sensors[jj].getPointing(kk, uv);
             // Computed measurement, y
-          ycb.fRot(qAtt, xyz);
+          ycb.fRot(this, xyz);
           ycs.fRot(qb2s, ycb);
           yc.set(ycs, 1);
             // Residual 
           r.minus(uv, yc);
             // Normal equations
-          a.partials(xyz, qb2s, qAtt);
+          a.partials(xyz, qb2s, this);
           ss.accumulate(a, w, r);   
         }
       }
@@ -204,8 +187,8 @@ public class AttitudeDetQuat implements IGetQ {
         // Poor man's constrained WLS...
       phat.unitize();
         // Update quaternion for output or next residual computation
-      qAtt.set(phat,1);
-      qAtt.standardize();
+      set(phat,1);
+      standardize();
       if (dpnew < tol  &&  dpnew <= dpold) {     
         break;
       }
