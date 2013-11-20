@@ -46,7 +46,8 @@ import com.motekew.vse.sensm.*;
  * @since    20130921
  * @since    20131109  modified to extend the Quaternion class
  */
-public class AttitudeDetQuatC extends Quaternion {
+public class AttitudeDetQuatC extends Quaternion
+                              implements IAttitudeUVecSolver {
   public static final int NY = 2;        // Number of measurements per set    
   public static final int NP = 3;        // Number of solve for parameters
 
@@ -83,7 +84,8 @@ public class AttitudeDetQuatC extends Quaternion {
    *                      returned if less than two measurements were
    *                      passed in.
    */ 
-  public int set(IPointingObsModeled[] sensors) {
+  @Override
+  public int solve(IPointingObsModeled[] sensors) {
     int numSensors = sensors.length;
 
       // First check to see if enough measurements are present
@@ -121,7 +123,7 @@ public class AttitudeDetQuatC extends Quaternion {
     double qs, qi, qj, qk;
 
       // Use a deterministic method for the first guess
-    attInit.set(sensors);
+    attInit.solve(sensors);
     set(attInit);
     standardize();
     phat.put(1, get(Q.QI));
