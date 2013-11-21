@@ -24,7 +24,6 @@ import com.motekew.vse.enums.DDX3D;
 import com.motekew.vse.intxm.IStepper;
 import com.motekew.vse.math.Quaternion;
 import com.motekew.vse.math.Tuple3D;
-import com.motekew.vse.trmtm.Acceleration;
 import com.motekew.vse.trmtm.RotatingBodySys;
 
 /**
@@ -50,8 +49,7 @@ import com.motekew.vse.trmtm.RotatingBodySys;
 public class RotatingCentralBody implements ICentralBody, IStepper {
   private RotatingBodySys rbs  = null;
   private Gravity grav = null;
-
-  Acceleration accel = new Acceleration();
+  private GravitationalAcceleration accel = null;
 
   /**
    * Intialize with a <code>RotatingBodySys</code> to model the position
@@ -64,6 +62,7 @@ public class RotatingCentralBody implements ICentralBody, IStepper {
   public RotatingCentralBody(RotatingBodySys rbs_in, Gravity g_in) {
     rbs  = rbs_in;
     grav = g_in;
+    accel = new GravitationalAcceleration(grav);
   }
 
   /**
@@ -131,8 +130,7 @@ public class RotatingCentralBody implements ICentralBody, IStepper {
    */
   @Override
   public void gravt(double r, double lat, double lon) {
-    grav.gravt(r, lat, lon);
-    accel.set(grav);
+    accel.gravt(r, lat, lon);
   }
 
   /**
@@ -140,8 +138,7 @@ public class RotatingCentralBody implements ICentralBody, IStepper {
    */
   @Override
   public void gravt(int degree, double r, double lat, double lon) {
-    grav.gravt(degree, r, lat, lon);
-    accel.set(grav);
+    accel.gravt(degree, r, lat, lon);
   }
 
   /**
@@ -149,8 +146,7 @@ public class RotatingCentralBody implements ICentralBody, IStepper {
    */  
   @Override
   public void gravt(Tuple3D pos) {
-    grav.gravt(pos);
-    accel.set(grav);
+    accel.gravt(pos);
   }
 
   /**
@@ -158,8 +154,7 @@ public class RotatingCentralBody implements ICentralBody, IStepper {
    */  
   @Override
   public void gravt(int degree, Tuple3D pos) {
-    grav.gravt(degree, pos);
-    accel.set(grav);
+    accel.gravt(degree, pos);
   }
 
   /**

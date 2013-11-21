@@ -1,7 +1,6 @@
 package com.motekew.vse.test;
 
 import com.motekew.vse.envrm.*;
-import com.motekew.vse.trmtm.Acceleration;
 import com.motekew.vse.math.*;
 
 /**
@@ -66,7 +65,7 @@ public class TestGravt {
     
     SphereCart pos = new SphereCart();
     double r  = 1.5;
-    Acceleration accel = new Acceleration();
+    GravitationalAcceleration accel = new GravitationalAcceleration(geo);
     double lat;
     double lon;
     
@@ -75,30 +74,26 @@ public class TestGravt {
       System.out.println("--- Deg/Order = " + ii + " ---");
       lat = Math.toRadians(50.0);
       lon = Math.toRadians(-100.0);
-      geo.gravt(ii, r, lat, lon);
-      accel.set(geo);
+      accel.gravt(ii, r, lat, lon);
       System.out.println("Given r lat lon, then pos");
       System.out.println("Lat = "   + Math.toDegrees(lat) + 
                        "\tLon = "   + Math.toDegrees(lon) +
                        "\tAccel:  " + accel);
       pos.setRElAz(r, lat, lon);
-      geo.gravt(ii, pos);
-      accel.set(geo);
+      accel.gravt(ii, pos);
       System.out.println("Lat = "   + Math.toDegrees(lat) + 
                        "\tLon = "   + Math.toDegrees(lon) +
                        "\tAccel:  " + accel);      
         //
       lat = Math.toRadians(-50.0);
       lon = Math.toRadians(100.0);
-      geo.gravt(ii, r, lat, lon);
-      accel.set(geo);
+      accel.gravt(ii, r, lat, lon);
       System.out.println("Given r lat lon, then pos");
       System.out.println("Lat = "   + Math.toDegrees(lat) + 
                        "\tLon = "   + Math.toDegrees(lon) +
                        "\tAccel:  " + accel);
       pos.setRElAz(r, lat, lon);
-      geo.gravt(ii, pos);
-      accel.set(geo);
+      accel.gravt(ii, pos);
       System.out.println("Lat = "   + Math.toDegrees(lat) + 
                        "\tLon = "   + Math.toDegrees(lon) +
                        "\tAccel:  " + accel);

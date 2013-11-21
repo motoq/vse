@@ -32,5 +32,7 @@ import com.motekew.vse.trmtm.*;
  * @author   Kurt Motekew
  * @since    20090331
  */
-public interface ICentralBody extends ISpherical, IGravity, IPosition, IAttitude {
+public interface ICentralBody extends ISpherical, IGravity,
+                                      IGravitationalAcceleration,
+                                      IPosition, IAttitude {
 }

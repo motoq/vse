@@ -1,7 +1,7 @@
 /*
- c  IGravity.java
+ c  IGravitationalPotential.java
  c
- c  Copyright (C) 2000, 2013 Kurt Motekew
+ c  Copyright (C) 2013 Kurt Motekew
  c
  c  This library is free software; you can redistribute it and/or
  c  modify it under the terms of the GNU Lesser General Public   
@@ -21,44 +21,30 @@
 
 package com.motekew.vse.envrm;
 
+import com.motekew.vse.enums.IGetDDX3D;
+import com.motekew.vse.math.Tuple3D;
+
 /**
- * This interface defines the expected behavior of an object
- * modeling gravitational potential.
+ * This interface defines an interface to an object generating
+ * gravitational acceleration.
  * 
  *  @author  Kurt Motekew
- *  @since   20090330
- *  @since   20131120   Removed gravt (acceleration) computations
- *                      from interface.
+ *  @since   20131120
  */
-public interface IGravity {
+public interface IGravitationalAcceleration extends IGetDDX3D {
 
   /**
-   * @return    Gravitational Parameter (distance_units^3/time_units^2)
+   * gravt without the option of specifying the degree/order to be
+   * used.
    */
-  public double getGravParam();
-  
-  /**
-   * @return    Scaling radius used to compute gravitational potential
-   */
-  public double getRefRadius();
+  public void gravt(double r, double elevation, double azimuth);
 
   /**
-   * @return    The degree and order of this gravity model.
-   */
-  public int getDegreeOrder();
-
-  /**
-   * getPotential without the option of specifying degree/order.
-   */
-  public double getPotential(double r, double elevation,
-                                       double azimuth);
-
-  /**
-   * Returns the gravitational potential given a position relative to the
-   * centroid of the body.
+   * Generates the gravitational acceleration given a position relative to the
+   * centroid of the body.  Input position is in spherical (radius, ele, az),
+   * and output is in Cartesian (x, y, z).
    *
-   * @param   degree      The degree and order to be used in evaluating
-   *                      the model.
+   * @param   degree      The degree and order to be used by the model.
    * @param   r           Distance from the centroid
    * @param   elevation   Elevation.  could be a latitude, or
    *                      co-latitude, depending on the function.
@@ -68,10 +54,22 @@ public interface IGravity {
    *                      -PI/2 and +PI/2.
    * @param   azimuth     Azimuth.  Once again, define range and what is
    *                      meant.  This could be a longitude.
-   *
-   * @return              Gravitational potential at the input position.
    */
-  public double getPotential(int degree, double r, double elevation,
-                                                   double azimuth);
+  public void gravt(int degree, double r, double elevation, double azimuth);
+
+  /**
+   * gravt without the option of specifying the degree/order to be used.
+   */
+  public void gravt(Tuple3D pos);
+
+  /**
+   * This version of gravt accepts body relative Cartesian position as an
+   * input.
+   *
+   * @param   degree   The degree and order to be used by this model.
+   * @param   pos      Position relative to the centroid.
+   * @param   accel    Output:  Acceleration, relative to the body centroid.
+   */
+  public void gravt(int degree, Tuple3D pos);
 
 }
