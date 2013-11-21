@@ -22,14 +22,15 @@
 package com.motekew.vse.envrm;
 
 import com.motekew.vse.enums.Basis3D;
-import com.motekew.vse.math.*;
+import com.motekew.vse.math.Tuple3D;
 import com.motekew.vse.trmtm.Acceleration;
 
 /**
  * This extension of Tuple3D/Acceleration makes use of the
  * <code>Gravity</code> class to compute gravitational acceleration via
  * the <code>IGravitationalAcceleration</code> interface.  It is initialized
- * with (and points to, not copies) an initialized Gravity object.
+ * with (and points to, not copies) an initialized Gravity object.  Pointing
+ * to the object shouldn't be an issue since Gravity should be immutable.
  *
  * @author   Kurt Motekew
  * @since    20131120   Separated from the Gravity class

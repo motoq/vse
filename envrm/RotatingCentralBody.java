@@ -62,7 +62,7 @@ public class RotatingCentralBody implements ICentralBody, IStepper {
   public RotatingCentralBody(RotatingBodySys rbs_in, Gravity g_in) {
     rbs  = rbs_in;
     grav = g_in;
-    accel = new GravitationalAcceleration(grav);
+    accel = grav.getGravityModel();
   }
 
   /**
@@ -123,6 +123,17 @@ public class RotatingCentralBody implements ICentralBody, IStepper {
   @Override
   public double getR(double lat, double lon) {
     return grav.getR(lat, lon);
+  }
+
+  /**
+   * Creates a new gravitational acceleration model using this central body's
+   * internal Gravity model.
+   *
+   * @return   New gravitational acceleration model.
+   */
+  @Override
+  public GravitationalAcceleration getGravityModel() {
+    return new GravitationalAcceleration(grav);
   }
 
   /**

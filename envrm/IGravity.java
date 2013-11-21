@@ -22,8 +22,8 @@
 package com.motekew.vse.envrm;
 
 /**
- * This interface defines the expected behavior of an object
- * modeling gravitational potential.
+ * This interface defines the expected behavior of an IMMUTABLE object
+ * WITHOUT caching, modeling gravitational potential.
  * 
  *  @author  Kurt Motekew
  *  @since   20090330
@@ -74,4 +74,6 @@ public interface IGravity {
   public double getPotential(int degree, double r, double elevation,
                                                    double azimuth);
 
+  /** @return  Object for computing gravitational acceleration */
+  public GravitationalAcceleration getGravityModel();
 }

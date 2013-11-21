@@ -62,10 +62,10 @@ public class TestGravt {
     double gm = (3600.*398600.4418/(6378.137*6378.137*6378.137));
     SphericalHarmonicCoeff shc = new SphericalHarmonicCoeff(false, clM.values(), slM.values());
     Gravity geo = new Gravity(gm, 1.0, shc);
+    GravitationalAcceleration accel = geo.getGravityModel();
     
     SphereCart pos = new SphereCart();
     double r  = 1.5;
-    GravitationalAcceleration accel = new GravitationalAcceleration(geo);
     double lat;
     double lon;
     

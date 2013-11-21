@@ -42,6 +42,11 @@ import com.motekew.vse.trmtm.Acceleration;
  * has been done.
  * <P>
  * Initial validation has been performed.
+ * <P>
+ * This class should be kept IMMUTABLE for thread safety given it is
+ * most efficient to pass this object around for others to access
+ * as needed for computations.  In addition, no caching should be
+ * performed.
  * 
  * @author   Kurt Motekew
  * @since    20090330
@@ -194,6 +199,18 @@ public class Gravity implements ISpherical, IGravity {
   @Override
   public double getR(double lat, double lon) {
     return this.getPotential(degreeOrder, re, lat, lon);
+  }
+
+  /**
+   * Creates a new gravitational acceleration model using this gravity model.
+   * Thread safety should be OK since this class is to remain immutable.
+   *
+   * @return   New gravitational acceleration model using a pointer to this
+   *           gravity model.
+   */
+  @Override
+  public GravitationalAcceleration getGravityModel() {
+    return new GravitationalAcceleration(this);
   }
 
   /**
