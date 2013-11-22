@@ -78,27 +78,22 @@ public class TestCholesky {
     
     System.out.println("\t--- TESTING LLS ---");
     
-    Tuple xTup = new Tuple(aMat.numCols());
-    
     yTup = new Tuple(yvals);
     aMat = new Matrix(apvals);
     SysSolver ss = new SysSolver(Decomposition.CHOLESKY, aMat);
-    xTup = new Tuple(ss.numSolveFor());
-    ss.solve(yTup, xTup);
+    ss.solve(yTup);
     System.out.println("\nUsing the SysSolver with Cholesky");
-    System.out.println("" + xTup);
+    System.out.println("" + ss);
     
-    xTup.zero();
     ss = new SysSolver(Decomposition.CROUT, aMat);
-    ss.solve(yTup, xTup);
+    ss.solve(yTup);
     System.out.println("\nUsing the SysSolver with Crout");
-    System.out.println("" + xTup);
+    System.out.println("" + ss);
 
-    xTup.zero();
     ss = new SysSolver(Decomposition.QR, aMat);
-    ss.solve(yTup, xTup);
+    ss.solve(yTup);
     System.out.println("\nUsing the SysSolver with QR");
-    System.out.println("" + xTup);
+    System.out.println("" + ss);
     
     System.out.println("\t--- TESTING WLS ---");
     
@@ -109,23 +104,20 @@ public class TestCholesky {
       wm.put(ii, ii, 1.0/(sig*sig));
     }
     
-    xTup.zero();
     SysSolverWeighted wss = new SysSolverWeighted(Decomposition.CHOLESKY, aMat, wm);
-    wss.solve(yTup, xTup);
+    wss.solve(yTup);
     System.out.println("\nUsing the Weighted SysSolver with Cholesky");
-    System.out.println("" + xTup);
+    System.out.println("" + wss);
     
-    xTup.zero();
     wss = new SysSolverWeighted(Decomposition.CROUT, aMat, wm);
-    wss.solve(yTup, xTup);
+    wss.solve(yTup);
     System.out.println("\nUsing the Weighted SysSolver with Crout");
-    System.out.println("" + xTup);
+    System.out.println("" + wss);
     
-    xTup.zero();
     wss = new SysSolverWeighted(Decomposition.QR, aMat, wm);
-    wss.solve(yTup, xTup);
+    wss.solve(yTup);
     System.out.println("\nUsing the Weighted SysSolver with QR");
-    System.out.println("" + xTup);    
+    System.out.println("" + wss);    
   }
 
 }

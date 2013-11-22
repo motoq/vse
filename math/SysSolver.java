@@ -38,8 +38,9 @@ import com.motekew.vse.enums.Decomposition;
  *
  * @author   Kurt Motekew
  * @since    20130511
+ * @since    20131121   Extended Tuple
  */
-public class SysSolver {
+public class SysSolver extends Tuple {
   private final Decomposition method;
   private final Matrix aT_qT;           // aMat' or Q' for QR decomp
   private final Matrix f_r;             // Fisher info or R for QR
@@ -54,6 +55,7 @@ public class SysSolver {
    *                 copied.
    */
   public SysSolver(Decomposition meth, Matrix aMat) {
+    super(aMat.N);
     method = meth;
 
     aT_qT = new Matrix(aMat.numCols(), aMat.numRows());
@@ -69,7 +71,7 @@ public class SysSolver {
    * @param   aMat   New Jacobian for which to form the information matrix.
    *                 Values copied.
    */
-  public void set(Matrix aMat) {
+  public void setNormalEqns(Matrix aMat) {
     setup(aMat);
   }
 
@@ -84,28 +86,27 @@ public class SysSolver {
 
   /**
    * Given measurements/observations, compute the associated solve
-   * for parameters.
+   * for parameters (this Tuple).
    *
    * @param   yin   Input observations
-   * @param   xout  Output solve for parameters
    */
-  public void solve(Tuple yin, Tuple xout) {
+  public void solve(Tuple yin) {
     aTy_qTy.mult(aT_qT, yin);
     switch (method) {
       case CHOLESKY:
-        f_r.solveCH(aTy_qTy, xout);
+        f_r.solveCH(aTy_qTy, this);
         break;
       case CROUT:
-        f_r.solve(aTy_qTy, xout);
+        f_r.solve(aTy_qTy, this);
         break;
       case QR:
           // Perform simple backwards substitution here for QR method
         for (int ii=f_r.M; ii>=1; ii--) {
-          xout.put(ii, aTy_qTy.get(ii));
+          put(ii, aTy_qTy.get(ii));
           for (int jj=(ii+1); jj<=f_r.N; jj++) {
-            xout.put(ii, xout.get(ii) - f_r.get(ii, jj)*xout.get(jj));
+            put(ii, get(ii) - f_r.get(ii, jj)*get(jj));
           }
-          xout.put(ii, xout.get(ii)/f_r.get(ii,ii));
+          put(ii, get(ii)/f_r.get(ii,ii));
         }
     }
   }

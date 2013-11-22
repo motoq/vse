@@ -47,8 +47,9 @@ package com.motekew.vse.math;
  *
  * @author   Kurt Motekew
  * @since    20130516
+ * @since    20131121   Extended Tuple
  */
-public class SysSolverBD {
+public class SysSolverBD extends Tuple {
   private final int NP;          // Number of solve for parameters
 
     // Individual measurement set - memory retained for efficiency
@@ -68,6 +69,7 @@ public class SysSolverBD {
    * @param   nP   The number of solve for parameters
    */
   public SysSolverBD(int nY, int nP) {
+    super(nP);
     NP = nP;
       // Update cached values
     at   = new Matrix(NP, nY);
@@ -117,16 +119,14 @@ public class SysSolverBD {
 
   /**
    * Given the current set of accumulated normal equations, solve for
-   * the unknown parameters.  More measurements may be accumulated
-   * afterwards or reset() may be called to start over from scratch.
-   *
-   * @param   xout   Output solve for parameters based on previously
-   *                 accumulated observations.
+   * the unknown parameters (this Tuple).  More measurements may be
+   * accumulated afterwards or reset() may be called to start over from
+   * scratch.
    */
-  public void solve(Tuple xout) {
+  public void solve() {
     infoM.set(satwa);
     infoM.cholesky();
-    infoM.solveCH(satwy, xout);
+    infoM.solveCH(satwy, this);
   }
 
   /**

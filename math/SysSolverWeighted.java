@@ -38,8 +38,9 @@ import com.motekew.vse.enums.Decomposition;
  *
  * @author   Kurt Motekew
  * @since    20130511
+ * @since    20131121   Extended Tuple
  */
-public class SysSolverWeighted {
+public class SysSolverWeighted extends Tuple {
   private final Decomposition method;
   private final Matrix aTW_qT;        // aMat'W or Q' from QR(sqrt(wm)*aMat)
   private final Matrix wm;            // Weighting matrix (or sqrt(wm))
@@ -58,6 +59,7 @@ public class SysSolverWeighted {
    *                 copied.
    */
   public SysSolverWeighted(Decomposition meth, Matrix aMat, Matrix wMat) {
+    super(aMat.N);
     method = meth;
 
       // Set the weighting matrix value here
@@ -77,7 +79,7 @@ public class SysSolverWeighted {
    * @param   aMat   New Jacobian for which to form the information matrix.
    *                 Values copied.
    */
-  public void set(Matrix aMat) {
+  public void setNormalEqns(Matrix aMat) {
     setup(aMat);
   }
 
@@ -88,7 +90,7 @@ public class SysSolverWeighted {
    * @param   aMat   New Jacobian for which to form the information matrix.
    * @param   wMat   New weighting matrix
    */
-  public void set(Matrix aMat, Matrix wMat) {
+  public void setNormalEqns(Matrix aMat, Matrix wMat) {
     wm.set(wMat);
     setup(aMat);
   }
@@ -104,12 +106,11 @@ public class SysSolverWeighted {
 
   /**
    * Given measurements/observations, compute the associated solve
-   * for parameters.
+   * for parameters (this Tuple).
    *
    * @param   yin   Input observations
-   * @param   xout  Output solve for parameters
    */
-  public void solve(Tuple yin, Tuple xout) {
+  public void solve(Tuple yin) {
       // For QR, set observations to product of the square root
       // of the weighting matrix and the inputs.  Otherwise, just
       // point the observations Tuple to the inputs.
@@ -124,19 +125,19 @@ public class SysSolverWeighted {
     aTWy_qTy.mult(aTW_qT, obs);
     switch (method) {
       case CHOLESKY:
-        f_r.solveCH(aTWy_qTy, xout);
+        f_r.solveCH(aTWy_qTy, this);
         break;
       case CROUT:
-        f_r.solve(aTWy_qTy, xout);
+        f_r.solve(aTWy_qTy, this);
         break;
       case QR:
         // Perform simple backwards substitution here for QR method
       for (int ii=f_r.M; ii>=1; ii--) {
-        xout.put(ii, aTWy_qTy.get(ii));
+        put(ii, aTWy_qTy.get(ii));
         for (int jj=(ii+1); jj<=f_r.N; jj++) {
-          xout.put(ii, xout.get(ii) - f_r.get(ii, jj)*xout.get(jj));
+          put(ii, get(ii) - f_r.get(ii, jj)*get(jj));
         }
-        xout.put(ii, xout.get(ii)/f_r.get(ii,ii));
+        put(ii, get(ii)/f_r.get(ii,ii));
       }
     }
   }

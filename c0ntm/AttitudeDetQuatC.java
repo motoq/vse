@@ -56,7 +56,7 @@ public class AttitudeDetQuatC extends Quaternion
                                          // AttitudeDetQuat
 
   private AttitudeDetTRIAD attInit = new AttitudeDetTRIAD();
-  private SysSolverBD ss = new SysSolverBD(NY, NP);
+  private SysSolverBD dp = new SysSolverBD(NY, NP);
   private Matrix qCov;
 
   /**
@@ -64,7 +64,7 @@ public class AttitudeDetQuatC extends Quaternion
    * the stored covariance is valid.
    */
   public AttitudeDetQuatC() {
-    qCov = ss.emptyCovariance();
+    qCov = dp.emptyCovariance();
   }
 
   /**
@@ -103,7 +103,6 @@ public class AttitudeDetQuatC extends Quaternion
     Tuple2D uv   = new Tuple2D();         // Sensor pointing vec
 
     Tuple phat = new Tuple(NP);           // Vector of solve for params
-    Tuple dp   = new Tuple(NP);           // Update to estimate
     double dpnew;
     double dpold = tol*100.0;
 
@@ -131,7 +130,7 @@ public class AttitudeDetQuatC extends Quaternion
     phat.put(3, get(Q.QK));
     int nMeas;
     for (nitr=1; nitr<maxitr; nitr++) {
-      ss.reset();
+      dp.reset();
       for (int jj=0; jj<numSensors; jj++) {
         nMeas = sensors[jj].getNumMeasurements();
         if (nMeas < 1) {
@@ -163,14 +162,14 @@ public class AttitudeDetQuatC extends Quaternion
           r.minus(uv, yc);
             // Normal equations
           a.partials(xyz, qb2s, this);
-          ss.accumulate(a, w, r);   
+          dp.accumulate(a, w, r);   
         }
       }
       try {
           // Solve for complex components of quaternion
           // and associated covariance.
-        ss.solve(dp);
-        ss.covariance(qCov);
+        dp.solve();
+        dp.covariance(qCov);
       } catch(SingularMatrixException sme) {
         System.out.println("Can't decompose information matrix");
         return -1;

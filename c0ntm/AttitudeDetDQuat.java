@@ -100,7 +100,6 @@ public class AttitudeDetDQuat extends Quaternion
     Tuple3D xyz_s = new Tuple3D();        // Modeled/known pointing vec in s
     Tuple2D uvc   = new Tuple2D();        // Computed measurement
 
-    Tuple3D qe_vec = new Tuple3D();       // Update to attitude estimate (vector)
     Quaternion qe  = new Quaternion();    // Update to attitude, quat
     Quaternion qtmp = new Quaternion();   // Temporary quaternion
 
@@ -110,7 +109,7 @@ public class AttitudeDetDQuat extends Quaternion
 
     Matrix  w = new Matrix(NY);           // Weigthing matrix
     Tuple2D r = new Tuple2D();            // Residual
-    SysSolverBD ss = new SysSolverBD(NY, NP);
+    SysSolverBD qe_vec = new SysSolverBD(NY, NP);  
 
     Tuple2D sigmaUV = new Tuple2D();
     double sii, sjj, wii, wjj;
@@ -119,7 +118,7 @@ public class AttitudeDetDQuat extends Quaternion
     set(attInit);
     int nMeas;
     for (nitr=1; nitr<maxitr; nitr++) {
-      ss.reset();
+      qe_vec.reset();
       for (int jj=0; jj<numSensors; jj++) {
         nMeas = sensors[jj].getNumMeasurements();
         if (nMeas < 1) {
@@ -149,20 +148,20 @@ public class AttitudeDetDQuat extends Quaternion
           r.minus(uv, uvc);
             // Normal equations
           partials(xyz, a);
-          ss.accumulate(a, w, r);
+          qe_vec.accumulate(a, w, r);
         }
       }
       try {
-        ss.solve(qe_vec);
-        ss.reset();
+        qe_vec.solve();
+        qe_vec.reset();
       } catch(SingularMatrixException sme) {
         System.out.println("Can't decompose information matrix");
         return -1;
       } 
         // Scalar = 1 from instantiation
-      qe.put(Q.QI, qe_vec.get(Basis3D.I));
-      qe.put(Q.QJ, qe_vec.get(Basis3D.J));
-      qe.put(Q.QK, qe_vec.get(Basis3D.K));
+      qe.put(Q.QI, qe_vec.get(1));
+      qe.put(Q.QJ, qe_vec.get(2));
+      qe.put(Q.QK, qe_vec.get(3));
       qtmp.set(this);
       mult(qtmp, qe);
       normalize();
