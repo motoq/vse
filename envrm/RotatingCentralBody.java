@@ -20,7 +20,6 @@
  */
 package com.motekew.vse.envrm;
 
-import com.motekew.vse.enums.DDX3D;
 import com.motekew.vse.intxm.IStepper;
 import com.motekew.vse.math.Quaternion;
 import com.motekew.vse.math.Tuple3D;
@@ -49,7 +48,6 @@ import com.motekew.vse.trmtm.RotatingBodySys;
 public class RotatingCentralBody implements ICentralBody, IStepper {
   private RotatingBodySys rbs  = null;
   private Gravity grav = null;
-  private GravitationalAcceleration accel = null;
 
   /**
    * Intialize with a <code>RotatingBodySys</code> to model the position
@@ -62,16 +60,6 @@ public class RotatingCentralBody implements ICentralBody, IStepper {
   public RotatingCentralBody(RotatingBodySys rbs_in, Gravity g_in) {
     rbs  = rbs_in;
     grav = g_in;
-    accel = grav.getGravityModel();
-  }
-
-  /**
-   * @return   Acceleration components computed via gravt, relative to the
-   *           body.  See <code>Gravity</code>.
-   */
-  @Override
-  public double get(DDX3D ndx) {
-    return accel.get(ndx);
   }
 
   /**
@@ -134,38 +122,6 @@ public class RotatingCentralBody implements ICentralBody, IStepper {
   @Override
   public GravitationalAcceleration getGravityModel() {
     return new GravitationalAcceleration(grav);
-  }
-
-  /**
-   * Computes gravitational acceleration.  See <code>Gravity</code>.
-   */
-  @Override
-  public void gravt(double r, double lat, double lon) {
-    accel.gravt(r, lat, lon);
-  }
-
-  /**
-   * Computes gravitational acceleration.  See <code>Gravity</code>.
-   */
-  @Override
-  public void gravt(int degree, double r, double lat, double lon) {
-    accel.gravt(degree, r, lat, lon);
-  }
-
-  /**
-   * Computes gravitational acceleration.  See <code>Gravity</code>.
-   */  
-  @Override
-  public void gravt(Tuple3D pos) {
-    accel.gravt(pos);
-  }
-
-  /**
-   * Computes gravitational acceleration.  See <code>Gravity</code>.
-   */  
-  @Override
-  public void gravt(int degree, Tuple3D pos) {
-    accel.gravt(degree, pos);
   }
 
   /**

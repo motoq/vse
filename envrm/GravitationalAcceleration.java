@@ -35,8 +35,7 @@ import com.motekew.vse.trmtm.Acceleration;
  * @author   Kurt Motekew
  * @since    20131120   Separated from the Gravity class
  */
-public class GravitationalAcceleration extends Acceleration
-                                       implements IGravitationalAcceleration {
+public class GravitationalAcceleration extends Acceleration {
   private final int degreeOrder;
   private Gravity gravityModel;
 
@@ -57,7 +56,6 @@ public class GravitationalAcceleration extends Acceleration
    * @param   lat      Latitude:  -pi/2 <= ele <= pi/2  (rad)
    * @param   lon      Longitude: -pi   <= az  <= pi    (rad)
    */
-  @Override
   public void gravt(double r, double lat, double lon) {
     gravt(degreeOrder, r, lat, lon);
   }
@@ -73,7 +71,6 @@ public class GravitationalAcceleration extends Acceleration
    * @param   lat      Latitude:  -pi/2 <= ele <= pi/2  (rad)
    * @param   lon      Longitude: -pi   <= az  <= pi    (rad)
    */
-  @Override
   public void gravt(int degree, double r, double lat, double lon) {
     double slat = Math.sin(lat);
     double clat = Math.cos(lat);
@@ -89,7 +86,6 @@ public class GravitationalAcceleration extends Acceleration
    *
    * param   pos      Position, body fixed, relative to the centroid.
    */
-  @Override
   public void gravt(Tuple3D pos) {
     gravt(degreeOrder, pos);
   }
@@ -102,7 +98,6 @@ public class GravitationalAcceleration extends Acceleration
    * @param   degree   The degree and order of this model.
    * @param   pos      Position, body fixed, relative to the centroid.
    */
-  @Override
   public void gravt(int degree, Tuple3D pos) {
     double r, rp2, slat, clat, lon;
     double rx = pos.get(Basis3D.I);
