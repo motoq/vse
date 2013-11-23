@@ -130,15 +130,16 @@ public class SysSolverBD extends Tuple {
   }
 
   /**
-   * This method is a convenience routine used to return a matrix
-   * of dimensions matching that of the estimated parameter covariance.
-   * It can be used with the covariance() method.
+   * Returns the covariance based on the current set of accumulated
+   * normal equations.
    *
-   * @return   A properly sized matrix to be used for covariance
-   *           requests.
+   * @return   Estimate covariance, new instance
    */
-  public Matrix emptyCovariance() {
-    return new Matrix(NP);
+  public Matrix covariance() {
+    Matrix cov = new Matrix(satwa);
+    cov.invert();
+
+    return cov;
   }
 
   /**
@@ -147,7 +148,7 @@ public class SysSolverBD extends Tuple {
    *
    * @param   cov   Output estimate covariance.
    */
-  public void covariance(Matrix cov) {
+  void covariance(Matrix cov) {
     cov.set(satwa);
     cov.invert();
   }

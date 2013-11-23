@@ -62,15 +62,7 @@ public class AttitudeDetQuat extends Quaternion
 
   private AttitudeDetTRIAD attInit = new AttitudeDetTRIAD();
   private SysSolverBD dp = new SysSolverBD(NY, NP);
-  private Matrix qCov;
-
-  /**
-   * Initializes the class - estimateAtt() must be called before
-   * the stored covariance is valid.
-   */
-  public AttitudeDetQuat() {
-    qCov = dp.emptyCovariance();
-  }
+  private Covariance qCov = new Covariance(NP);
 
   /**
    * Estimates attitude of a body given pointing vectors supplied by
@@ -174,7 +166,7 @@ public class AttitudeDetQuat extends Quaternion
       }
       try {
         dp.solve();
-        dp.covariance(qCov);
+        qCov.set(dp);
       } catch(SingularMatrixException sme) {
         System.out.println("Can't decompose information matrix");
         return -1;
