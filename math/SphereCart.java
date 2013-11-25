@@ -1,7 +1,7 @@
 /*
  c  SphereCart.java
  c
- c  Copyright (C) 2000, 2013 Kurt Motekew
+ c  Copyright (C) 2013 Kurt Motekew
  c
  c  This library is free software; you can redistribute it and/or
  c  modify it under the terms of the GNU Lesser General Public   

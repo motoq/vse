@@ -75,7 +75,7 @@ public class TestQR {
     Tuple[] qCols = new Tuple[n];
     for (int ii=0; ii<n; ii++) {
       qCols[ii] = new Tuple(m);
-      q.getColumn(ii+1, qCols[ii]);
+      qCols[ii].setColumn(ii+1, q);
     }
     for (int ii=0; ii<n; ii++) {
       for (int jj=0; jj<n; jj++) {

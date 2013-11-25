@@ -266,6 +266,26 @@ public class Tuple extends VectorSpace {
   }
 
   /**
+   * Copy a column of elements from input Matrix into this Tuple
+   *
+   * @param   colNum   Column to return:  1->numCol
+   * @param   mtx      Matrix from which to copy a column.
+   */
+  public void setColumn(int colNum, Matrix mtx) {
+    if (N != mtx.M) {
+      throw new VectorSpaceArgumentException("The Tuple isn't the right size");
+    } else if (colNum > mtx.N  ||  colNum < 1) {
+      throw new VectorSpaceArgumentException("Invalid column number request");
+    }
+   
+    colNum--;                               // Internal storage 0 based
+    double[][] mtxvals = mtx.valuesPtr();
+    for (int ii=0; ii<N; ii++) {
+      vals[ii] = mtxvals[ii][colNum];
+    }
+  }
+
+  /**
    * Returns an array representation of this tuple.  The array will
    * have the same dimensions as the tuple.                        
    *

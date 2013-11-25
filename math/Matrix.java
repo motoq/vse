@@ -338,27 +338,6 @@ public class Matrix extends VectorSpace {
   }
 
   /**
-   * Copy a column of elements from this Matrix into the supplied Tuple
-   *
-   * @param   colNum   Column to return - 1->numCol
-   * @param   tpl      Output Tuple, length must be the same as the number
-   *                   of rows in this Matrix
-   */
-  public void getColumn(int colNum, Tuple tpl) {
-    if (tpl.N != M) {
-      throw new VectorSpaceArgumentException("Your Tuple isn't big enough");
-    } else if (colNum > N  ||  colNum < 1) {
-      throw new VectorSpaceArgumentException("Invalid column number request");
-    }
-   
-    colNum--;                            // Internal storage 0 based
-    double[] tplvals = tpl.valuesPtr();
-    for (int ii=0; ii<M; ii++) {
-      tplvals[ii] = vals[ii][colNum];
-    }
-  }
-
-  /**
    * Set values of selected column of this Matrix to those of the input
    * Tuple
    *
@@ -641,7 +620,7 @@ public class Matrix extends VectorSpace {
    * Performs in-place transpose - requires this matrix be square otherwise
    * an exception will be thrown.
    */
-  public Matrix transpose() {
+  public void transpose() {
     double tmp;
     
     if (!mxm) {
@@ -656,7 +635,6 @@ public class Matrix extends VectorSpace {
         vals[ii][jj] = tmp;
       }
     }
-    return this;
   }
 
   /**
@@ -711,7 +689,7 @@ public class Matrix extends VectorSpace {
     Tuple qj = new Tuple(M);
     double rkk;
     for (int kk=1; kk<=N; kk++) {
-      qMat.getColumn(kk, qk);
+      qk.setColumn(kk, qMat);
       rkk = qk.mag();
       if (rkk < EPS) {
         throw new SingularMatrixException(
@@ -721,8 +699,8 @@ public class Matrix extends VectorSpace {
       qk.div(rkk);
       qMat.setColumn(kk, qk);                 // Done with Q's kth column
       for (int jj=(kk+1); jj<=N; jj++) {
-        qMat.getColumn(kk, qk);               // Get final version of qk
-        qMat.getColumn(jj, qj);               // Get next q column
+        qk.setColumn(kk, qMat);               // Get final version of qk
+        qj.setColumn(jj, qMat);               // Get next q column
         rMat.put(kk, jj, qk.dot(qj));         // Set R's kth row for this j
         qk.mult(rMat.get(kk, jj));
         qj.minus(qk);
