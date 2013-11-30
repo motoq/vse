@@ -61,9 +61,6 @@ public class DuvDqC extends Matrix {
    * @param   q      Inertial/computational to body reference frame
    *                 transformation quaternion.  This is what the partial is
    *                 taken w.r.t.
-   *
-   * @return         A pointer to this Jacobian relating u & v to  the complex
-   *                 components of q
    *                        <P>
    *                                  -                -
    *                           dpdq = | du/dq1  dv/dq1 |
@@ -71,7 +68,7 @@ public class DuvDqC extends Matrix {
    *                                  | du/dq3  dv/dq3 |
    *                                  -                -
    */
-  public Matrix partials(Tuple3D xyz, Quaternion qbs, Quaternion q) {
+  public void partials(Tuple3D xyz, Quaternion qbs, Quaternion q) {
       // Partial of sensor reference frame to body reference frame
     body2Sensor.set(qbs);
     dpdb.put(1, 1, body2Sensor.get(1,1));
@@ -106,7 +103,6 @@ public class DuvDqC extends Matrix {
       // Finally, partial of sensor to inertial
     this.mult(dpdb, dbdi);
 
-    return this;
   }
 
 }
