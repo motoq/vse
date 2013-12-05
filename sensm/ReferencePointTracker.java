@@ -66,6 +66,15 @@ public class ReferencePointTracker implements IPointingObsModeled {
   }
 
   /**
+   * Given the number of measurements returns is always deterministic (1),
+   * this method does nothing as getDirection() computes the pointing
+   * on the fly.
+   */
+  @Override
+  public void measure(double t) {
+  }
+
+  /**
    * @return    Indicates a single measurement will be returned
    */
   @Override

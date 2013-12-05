@@ -46,6 +46,9 @@ import com.motekew.vse.math.*;
 public class SimpleConeTracker implements IPointingObsModeled {
   private int nMax;
   private int nMeas = 0;
+
+  private IPointingPlatform plat;
+
     // Sensor orientation relative to body on which it is mounted
   private Quaternion body2Sensor = new Quaternion();
     // Computed reference vector in computational reference frame
@@ -62,13 +65,18 @@ public class SimpleConeTracker implements IPointingObsModeled {
   private boolean valid = true;
 
   /**
-   * @param    n   Maximum number of measurements that can be taken by
-   *               this sensor.  A random number generator will
-   *               determine if 1->n measurements are to be returned.
-   *               See measure() for more details.  If zero, then
-   *               no measurements will be returned.
+   * Initializes with the platform this sensor is attached to and the
+   * maximum number of measurement sets that may be returned at a time.
+   *
+   * @param    plt    Platform from which to get position, attitude, ect.,
+   * @param    n      Maximum number of measurements that can be taken by
+   *                  this sensor.  A random number generator will
+   *                  determine if 1->n measurements are to be returned.
+   *                  See measure() for more details.  If zero, then
+   *                  no measurements will be returned.
    */
-  public SimpleConeTracker(int n) {
+  public SimpleConeTracker(IPointingPlatform plt, int n) {
+    plat = plt;
     nMax = n;
     r_t_b_i = new Tuple3D[nMax];
     uv = new Tuple2D[nMax];
@@ -98,16 +106,23 @@ public class SimpleConeTracker implements IPointingObsModeled {
     coneWidth = fullcone;
   }
 
+  /** @return the full conewidth of the sensor FOR, radians */
+  public double getConeWidth() {
+    return coneWidth;
+  }
+
   /**
-   * Given the current body position and attitude, compute true and
-   * simulated measurements based on sensor characteristics (orientation,
-   * FOV, measurement noise).
+   * Given the current system time, compute true and simulated measurements
+   * based on sensor characteristics (orientation, FOV, measurement noise).
    *
-   * @param    rBody    Body position in the computational reference frame
-   * @param    i2Body   Body attitude relative to the computational reference
-   *                    frame 
+   * @param    t   System time. 
    */
-  public void measure(Tuple3D rBody, Quaternion i2Body) {
+  public void measure(double t) {
+    Tuple3D rBody = new Tuple3D();
+    Quaternion i2Body = new Quaternion();
+    plat.getPosition(t, rBody);
+    plat.getAttitude(t, i2Body);
+
     Quaternion qAtt = new Quaternion();  // Computational to Sensor
     qAtt.mult(i2Body, body2Sensor);
     Tuple3D r_t_b_s = new Tuple3D();     // Target relative to body in Sensor
@@ -226,6 +241,22 @@ public class SimpleConeTracker implements IPointingObsModeled {
   }
 
   /**
+   * @param   newMax  Sets the new maxinum allowable number of measurement
+   *                  sets to be taken on each call to measure()
+   */
+  public void setMaxMeas(int newMax) {
+    nMax = newMax;
+  }
+
+  /**
+   * @return   Maximum possible number of measurement sets taken on each call
+   *           to measure().
+   */
+  public int getMaxMeas() {
+    return nMax;
+  }
+
+  /**
    * Gets the 1-sigma standard deviation used when applying Gaussian
    * noise to the computed pointing angle measurements.
    * Noise is applied individually to 'u' and 'v'
@@ -236,6 +267,16 @@ public class SimpleConeTracker implements IPointingObsModeled {
   @Override
   public void getRandomError(Tuple2D sigOut) {
     sigOut.set(sigmaUV, sigmaUV);
+  }
+
+  /**
+   * This method is specific to this version of a IPointingObsModeled.
+   * The random error is the same in both directions for this sensor.
+   * 
+   * @return   The 1-sigma per axis random measuremen uncertainty.
+   */
+  public double getRandomError() {
+    return sigmaUV;
   }
 
   /**

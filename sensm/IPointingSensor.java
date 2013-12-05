@@ -24,14 +24,21 @@ package com.motekew.vse.sensm;
 import com.motekew.vse.math.*;
 
 /**
- * Defines an interface for a sensor where the resulting measurement
+ * Defines an interface for a sensor where the resulting measurement set
  * is defined by two measurements.  For, example, the x & y components
- * of a pointing vector, or azimuth and elevation values.
+ * of a pointing vector, or azimuth and elevation values.  The other
+ * aspect of this interface is each time a call to measure() is made,
+ * multiple measurement sets may be generated for the given time.  Hence,
+ * measure() would be called before checking how many measurements were taken
+ * and then accessing those measurements.
  *
  * @author   Kurt Motekew
  * @since    20120913
  */
 public interface IPointingSensor {
+
+  /** Source for data external to sensor */
+  public void measure(double t);
 
   /** Number of measurements taken */
   public int getNumMeasurements();
