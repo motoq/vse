@@ -83,6 +83,13 @@ public class Quaternion implements IGetQ {
   }
 
   /**
+   * @param   q2copy   Instantiate with a Quaternion to copy.
+   */
+  public Quaternion(Quaternion q2copy) {
+    set(q2copy);
+  }
+
+  /**
    * Sets the component values of this quaternion.
    *
    * @param  ndx   A <code>Q<code> indicating which component to

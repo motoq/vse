@@ -1,7 +1,7 @@
 /*
  c  SimpleConeTracker.java
  c
- c  Copyright (C) 2012 Kurt Motekew
+ c  Copyright (C) 2012, 2013 Kurt Motekew
  c
  c  This library is free software; you can redistribute it and/or
  c  modify it under the terms of the GNU Lesser General Public   
@@ -86,6 +86,15 @@ public class SimpleConeTracker implements IPointingObsModeled {
       uv[ii] = new Tuple2D();
       doa[ii] = new Tuple3D();
     }
+  }
+
+  /**
+   * @return   New class of sensor parameters.
+   */
+  public SimpleConeTrackerCfg getConfiguration() {
+    SimpleConeTrackerCfg cfg = new SimpleConeTrackerCfg(nMax, 
+                               coneWidth, Math.asin(sigmaUV), body2Sensor);
+    return cfg;
   }
 
   /**
@@ -262,7 +271,8 @@ public class SimpleConeTracker implements IPointingObsModeled {
    * Noise is applied individually to 'u' and 'v'
    *
    * @param    sigOut    Output 1-sigma per-axis random measurement
-   *                     uncertainty.  They are equal for this sensor type.
+   *                     uncertainty, sines.  They are equal for this sensor
+   *                     type.
    */
   @Override
   public void getRandomError(Tuple2D sigOut) {
@@ -273,7 +283,7 @@ public class SimpleConeTracker implements IPointingObsModeled {
    * This method is specific to this version of a IPointingObsModeled.
    * The random error is the same in both directions for this sensor.
    * 
-   * @return   The 1-sigma per axis random measuremen uncertainty.
+   * @return   The 1-sigma per axis random measurement uncertainty, sines.
    */
   public double getRandomError() {
     return sigmaUV;
@@ -284,7 +294,7 @@ public class SimpleConeTracker implements IPointingObsModeled {
    * Gaussian noise to the returned pointing angle measurements.
    * Noise is applied independently to 'u' and 'v'
    *
-   * @param    sigIn    1-sigma per-axis random measurement uncertainty
+   * @param    sigIn    1-sigma per-axis random measurement uncertainty, sines
    */
   public void setRandomError(double sigIn) {
     if (sigIn > 0.0) {

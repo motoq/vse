@@ -59,6 +59,18 @@ public class AttitudeDetQuatC extends Quaternion
   private SysSolverBD dp = new SysSolverBD(NY, NP);
   private Covariance qCov = new Covariance(NP);
 
+  private int nitr = 0;
+
+  /**
+   * @return   The number of iterations if the attitude has been sucessfully
+   *           solved.  Zero if a call to solve has not yet been made.  And
+   *           a negative one if convergence was not achieved.
+   */ 
+  @Override
+  public int iterations() { 
+    return nitr;
+  }
+
   /**
    * Estimates attitude of a body given pointing vectors supplied by
    * sensors and the modeled/known pointing vectors in the inertial/
@@ -88,9 +100,9 @@ public class AttitudeDetQuatC extends Quaternion
       }
     }
     if (validSensors < 2) {
-      return -1;
+      nitr = -1;
+      return nitr;
     }
-    int nitr;
 
     Tuple2D uv   = new Tuple2D();         // Sensor pointing vec
 

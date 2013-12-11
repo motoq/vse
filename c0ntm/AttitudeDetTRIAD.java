@@ -38,6 +38,18 @@ import com.motekew.vse.sensm.IPointingObsModeled;
  */
 public class AttitudeDetTRIAD extends Quaternion
                               implements IAttitudeUVecSolver {
+  private int nitr = 0;
+
+  /**
+   * @return   If this instance has been successfully solved, a 1 will
+   *           be returned (since this is a deterministic method).  Zero
+   *           if solve() has not been called yet.  '-1' if something went
+   *           wrong.
+   */ 
+  @Override
+  public int iterations() { 
+    return nitr;
+  }
 
   /**
    * Determine the Quaternion transforming known pointing vectors in reference
@@ -54,7 +66,7 @@ public class AttitudeDetTRIAD extends Quaternion
   @Override
   public int solve(IPointingObsModeled[] sensors) {
     Matrix3X3 mat = new Matrix3X3();
-    int nitr =  estimateAtt(sensors, mat);
+    estimateAtt(sensors, mat);
     set(mat);
     return nitr;
   }
@@ -161,8 +173,9 @@ public class AttitudeDetTRIAD extends Quaternion
     mObs.setColumns(s1, s2, s3);
 
     amat.mult(mObs, mRef);
-
-    return 0;    
+    
+    nitr = 1;
+    return nitr;    
   }
 
 }

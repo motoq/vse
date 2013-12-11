@@ -33,6 +33,9 @@ import com.motekew.vse.sensm.IPointingObsModeled;
  */
 public interface IAttitudeUVecSolver extends IGetQ {
 
+  /** @return The number of iterations used to last solve the system */
+  public int iterations();
+  
   /** @param   sensors  Resolve attitude given these sensors */
   public int solve(IPointingObsModeled[] sensors);
 
