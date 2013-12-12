@@ -35,7 +35,11 @@ import com.motekew.vse.math.*;
  * Upon being told to take a measurement, this sensor makes use of a
  * uniform random number generator and sensor FOV limits (a cone) to
  * create simulated reference point.  A Gaussian random number
- * generator is then used to perturb the "simulated" measurement. 
+ * generator is then used to perturb the "simulated" measurement.
+ * <P> 
+ * If the maximum number of measurements is set to zero, nothnig is
+ * done.  If the maximum number of measurements is set to 1, then one
+ * measurement will aways be taken. 
  * <P>
  * An example would be to simulate a star tracker when it is not
  * desired to make use of a star map and star recognition algorithms.
@@ -44,7 +48,7 @@ import com.motekew.vse.math.*;
  * @since    20121002
  */
 public class SimpleConeTracker implements IPointingObsModeled {
-  private int nMax;
+  private int nMax = 1;
   private int nMeas = 0;
 
   private IPointingPlatform plat;
@@ -65,31 +69,28 @@ public class SimpleConeTracker implements IPointingObsModeled {
   private boolean valid = true;
 
   /**
-   * Initializes with the platform this sensor is attached to and the
-   * maximum number of measurement sets that may be returned at a time.
+   * Initializes with the platform this sensor is attached to.  Default
+   * settings include always returning one measurement set, a 180 deg
+   * conewidth, and no random error.
    *
    * @param    plt    Platform from which to get position, attitude, ect.,
-   * @param    n      Maximum number of measurements that can be taken by
-   *                  this sensor.  A random number generator will
-   *                  determine if 1->n measurements are to be returned.
-   *                  See measure() for more details.  If zero, then
-   *                  no measurements will be returned.
    */
-  public SimpleConeTracker(IPointingPlatform plt, int n) {
+  public SimpleConeTracker(IPointingPlatform plt) {
     plat = plt;
-    nMax = n;
-    r_t_b_i = new Tuple3D[nMax];
-    uv = new Tuple2D[nMax];
-    doa = new Tuple3D[nMax];
-    for (int ii=0; ii<nMax; ii++) {
-      r_t_b_i[ii] = new Tuple3D();
-      uv[ii] = new Tuple2D();
-      doa[ii] = new Tuple3D();
-    }
   }
 
   /**
    * @return   New class of sensor parameters.
+   */
+  public void set(SimpleConeTrackerCfg cfg) {
+    setMaxMeas(cfg.maxMeasurementSets());
+    setConeWidth(cfg.fullConeWidth());
+    setRandomError(Math.sin(cfg.oneSigmaRandom()));
+    setOrientation(cfg.bodyToSensorAtt());
+  }  
+
+  /**
+   * @return   New instance of sensor parameters.
    */
   public SimpleConeTrackerCfg getConfiguration() {
     SimpleConeTrackerCfg cfg = new SimpleConeTrackerCfg(nMax, 
@@ -142,11 +143,16 @@ public class SimpleConeTracker implements IPointingObsModeled {
       return;
     }
 
-      // Find the number of measurements taken - add 1 since end is exclusive
-      // Ensure at least one measurement is taken (already exited above if
-      // nMax = zero (sensor turned off).
-    nMeas = myRand.nextInt(nMax+1);
-    nMeas = (nMeas > 0) ? nMeas : 1;
+      // Find the number of measurements taken - add 1 since end is exclusive,
+      // unless nMax = 1, then only take one measurement.  Ensure at least one
+      // measurement is taken (already exited above if nMax = zero (sensor
+      // turned off).
+    if (nMax == 1) {
+      nMeas = nMax;
+    } else {
+      nMeas = myRand.nextInt(nMax+1);
+      nMeas = (nMeas > 0) ? nMeas : 1;
+    }
 
     for (int ii=0; ii<nMeas; ii++) {
         // Fake reference point somewhere within conewidth
@@ -250,11 +256,27 @@ public class SimpleConeTracker implements IPointingObsModeled {
   }
 
   /**
-   * @param   newMax  Sets the new maxinum allowable number of measurement
-   *                  sets to be taken on each call to measure()
+   * Sets the maximum number of measurements that can be taken by this
+   * sensor.
+   *
+   * @param   newMax  Maximum number of measurements that can be taken by
+   *                  this sensor.  A random number generator will
+   *                  determine if 1->n measurements are to be returned.
+   *                  See measure() for more details.  If zero, then
+   *                  no measurements will be returned.
    */
   public void setMaxMeas(int newMax) {
-    nMax = newMax;
+    if (nMax != newMax) {
+      nMax = newMax;
+      r_t_b_i = new Tuple3D[nMax];
+      uv = new Tuple2D[nMax];
+      doa = new Tuple3D[nMax];
+      for (int ii=0; ii<nMax; ii++) {
+        r_t_b_i[ii] = new Tuple3D();
+        uv[ii] = new Tuple2D();
+        doa[ii] = new Tuple3D();
+      }
+    }
   }
 
   /**
