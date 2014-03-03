@@ -45,6 +45,14 @@ public class Tuple2D extends Tuple {
   }
 
   /**
+   * Default constructor
+   */
+  public Tuple2D(Tuple2D t2d) {
+    super(2);
+    this.set(t2d);
+  }
+
+  /**
    * Initialize with the following two elements.
    *
    * @param  u    First element

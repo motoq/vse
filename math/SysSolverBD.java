@@ -43,7 +43,7 @@ package com.motekew.vse.math;
  * probably best to only switch between accumulation methods between calls
  * to reset().
  *
- * Be sure to call reset() when used in an iterative least squares solution.
+ * BE SURE TO CALL reset() WHEN USED IN AN ITERATIVE LEAST SQUARES SOLUTION.
  *
  * @author   Kurt Motekew
  * @since    20130516
