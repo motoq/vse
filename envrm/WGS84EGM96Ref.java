@@ -21,7 +21,6 @@
 
 package com.motekew.vse.envrm;
 
-import com.motekew.vse.enums.LengthTimeUnits;
 import com.motekew.vse.math.Matrix;
 
 /**
@@ -34,23 +33,23 @@ import com.motekew.vse.math.Matrix;
  * @since    20121118
  */
 public class WGS84EGM96Ref implements ICentralBodyReference {
-  private LengthTimeUnits units = LengthTimeUnits.MSEC;
   
     // Degree/Order of available gravitational coefficients
   private static final int DEGORDER = 4;
   private Matrix cl;
   private Matrix sl;
 
+  private static final double SEC_PER_MIN = 60.0;
     // Meters and seconds
-  public static final double GM_MSEC   = 3986004.415E8;
-  public static final double A_M       = 6378136.3;
-  public static final double ER_M      = 6378137.0;
-  public static final double OMEGA_SEC = 7.292115E-5;
+  private static final double GM_MSEC   = 3986004.415E8;
+  private static final double A_M       = 6378136.3;
+  private static final double ER_M      = 6378137.0;
+  private static final double OMEGA_SEC = 7.292115E-5;
     // ER and minutes
-  public static final double GM_ERMN   = (GM_MSEC/(ER_M*ER_M*ER_M))*60.0*60.0;
-  public static final double A_ER      = A_M/ER_M;
-  public static final double ER_ER     = 1.0;
-  public static final double OMEGA_MN  = OMEGA_SEC*60.0;
+  private static final double GM_ERMN   = (GM_MSEC/(ER_M*ER_M*ER_M))*60.0*60.0;
+  private static final double A_ER      = A_M/ER_M;
+  private static final double ER_ER     = 1.0;
+  private static final double OMEGA_MN  = OMEGA_SEC*SEC_PER_MIN;
 
   /**
    * Initializes gravitational coefficients
@@ -91,44 +90,34 @@ public class WGS84EGM96Ref implements ICentralBodyReference {
   }
 
   /**
-   * @return   The type of units in use
+   * @return   Meters per internal distance units (ER)
    */
-  public LengthTimeUnits getUnits() {
-    return units;
-  }
+  @Override
+  public double metersPerDU() { return 6378137; }
 
   /**
-   * @param   newUnits   New units for returned parameters
+   * @return   Seconds per internal time units (minutes)
    */
-  public void setUnits(LengthTimeUnits newUnits) {
-    units = newUnits;
-  }
+  @Override
+  public double secondsPerTU() { return SEC_PER_MIN; }
 
   /**
-   * @return EGM96 Gravitational Parameter.  m^3/s^2 or ER^3/min^2
+   * @return EGM96 Gravitational Parameter, ER^3/min^2
    */
   @Override
   public double gravitationalParameter() {
-    if (units == LengthTimeUnits.MSEC) {
-      return GM_MSEC;
-    } else {
-      return GM_ERMN;
-    }
-  };
+    return GM_ERMN;
+  }
 
   /**
    * This is the "Earth Radius" value that should be used when
    * computing gravitational potential or acceleration.
    *
-   * @return EGM96 gravitational scaling factor, m or ER
+   * @return EGM96 gravitational scaling factor, ER
    */
   @Override
   public double gravitationalReferenceRadius() {
-    if (units == LengthTimeUnits.MSEC) {
-      return A_M;
-    } else {
-      return A_ER;
-    }
+    return A_ER;
   }
 
   /**
@@ -145,15 +134,11 @@ public class WGS84EGM96Ref implements ICentralBodyReference {
    * longitude, altitude and ITRF Cartesian coordinates.  It is also used to
    * convert values to units of ER.
    *
-   * @return WGS 84 defining parameter, ellipsoid semi-major axis, m or ER
+   * @return WGS 84 defining parameter, ellipsoid semi-major axis, ER
    */
   @Override
   public double ellipsoidSemiMajor() {
-    if (units == LengthTimeUnits.MSEC) {
-      return ER_M;
-    } else {
       return ER_ER;
-    }
   }
 
   /**
@@ -170,11 +155,7 @@ public class WGS84EGM96Ref implements ICentralBodyReference {
    */
   @Override
   public double angularVelocity() {
-    if (units == LengthTimeUnits.MSEC) {
-      return OMEGA_SEC;
-    } else {
-      return OMEGA_MN;
-    }
+    return OMEGA_MN;
   }
 
   /**

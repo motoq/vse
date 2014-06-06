@@ -79,7 +79,6 @@ public class InverseViaMult {
    */
   public static void main(String[] args) {
     ConsoleIO cio = new ConsoleIO();
-    // TODO Auto-generated method stub
     double den;;
     
     while ((den = cio.readDouble("Enter a number to invert (0 to exit):  ")) != 0.0) {

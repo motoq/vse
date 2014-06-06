@@ -35,6 +35,16 @@ import com.motekew.vse.math.Matrix;
 public interface ICentralBodyReference {
 
   /**
+   * Conversion from internal distance units to meters
+   */
+  public double metersPerDU();
+  
+  /**
+   * Conversion from internal time units to seconds
+   */
+  public double secondsPerTU();
+
+  /**
    * Gravitational Parameter for this gravity model, DU^3/TU^2
    */  
   public double gravitationalParameter();
