@@ -410,3 +410,23 @@ public class Tuple3D extends Tuple implements IGetBasis3D {
     return("x y z:  " + get(1) + " " + get(2) + " " + get(3));
   }
 }
+
+/* Works but has issues under some conditions
+  public void fRot(Quaternion q, Tuple3D r) {
+    double[] rvals = r.valuesPtr();          
+    double ri = rvals[0];          
+    double rj = rvals[1];
+    double rk = rvals[2];
+    double qs = q.get(Q.Q0);
+    double qi = q.get(Q.QI);
+    double qj = q.get(Q.QJ);
+    double qk = q.get(Q.QK);
+    double rdq = ri*qi + rj*qj + rk*qk;
+      //
+    double[] ovals = this.valuesPtr();
+
+    ovals[0] = 2.0*(qs*(ri*qs + rj*qk - rk*qj) + qi*rdq) - ri;
+    ovals[1] = 2.0*(qs*(rj*qs + rk*qi - ri*qk) + qj*rdq) - rj;
+    ovals[2] = 2.0*(qs*(rk*qs + ri*qj - rj*qi) + qk*rdq) - rk;
+  }
+ */
