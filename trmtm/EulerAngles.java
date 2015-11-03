@@ -93,12 +93,14 @@ public class EulerAngles extends Tuple3D {
 
   /**
    * Sets the value of the EulerAngles given a <code>EulerA</code>
-   * enum index.
+   * enum index.  Ensures heading is withing +/- 180 and bank/elevation
+   * are +/- 90.
    *
    * @param  ndx   A EulerA index for the row
    * @param  val   A double value in radians to be set for the EulerAngles
    */
   public void put(EulerA ndx, double val) {
+    val = Angles.setPI(val);
     put(ndx.ordinal()+1, val);
   }
 
@@ -122,7 +124,7 @@ public class EulerAngles extends Tuple3D {
    * @param  val   A double value in degrees to be set for the EulerAngles
    */
   public void putDeg(EulerA ndx, double val) {
-    put(ndx.ordinal()+1, Angles.RAD_PER_DEG*val);
+    put(ndx, Angles.RAD_PER_DEG*val);
   }
 
   /**
@@ -134,7 +136,7 @@ public class EulerAngles extends Tuple3D {
    * @return       A double value in degrees for the requested element
    */
   public double getDeg(EulerA ndx) {
-    return Angles.DEG_PER_RAD*get(ndx.ordinal()+1);
+    return Angles.DEG_PER_RAD*get(ndx);
   }
 
   /**

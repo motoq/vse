@@ -33,8 +33,13 @@ import com.motekew.vse.enums.*;
  * @since  20080830
  */
 public class Quaternion implements IGetQ {
-    /** tolerance value used for numeric considerations */
-  public static final double TOL = 0.000001;
+  private static final Tuple3D IHAT = new Tuple3D(1.0, 0.0, 0.0);
+  private static final Tuple3D JHAT = new Tuple3D(0.0, 1.0, 0.0);
+  private static final Tuple3D KHAT = new Tuple3D(0.0, 0.0, 1.0);  
+
+    // tolerance value used for numeric considerations
+  private static final double TOL = 0.000001;
+
     /** 
      * DCM to quaternion alg selection factor.  0.25 requires
      * the first solved for quaternion element to be at least
@@ -180,6 +185,28 @@ public class Quaternion implements IGetQ {
     qi = t3d.get(I)*alpha;
     qj = t3d.get(J)*alpha;
     qk = t3d.get(K)*alpha;
+  }
+
+  /**
+   * Sets the quaternion given an axis about which to rotate and an angle. 
+   * 
+   * @param    alpha    Angle, in radians
+   * @param    axis     Cartesian axis about which to rotate
+   */
+  public void set(double alpha, Basis3D axis) {
+    switch (axis) {
+      case I:
+        set(alpha, IHAT);
+        break;
+      case J:
+        set(alpha, JHAT);
+        break;
+      case K:
+        set(alpha, KHAT);
+        break;
+      default:
+        identity();
+    }
   }
 
   /**

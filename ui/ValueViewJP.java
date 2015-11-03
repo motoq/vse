@@ -35,27 +35,40 @@ import javax.swing.*;
  */
 public class ValueViewJP extends JPanel {
 
-  private static final DecimalFormat df = new DecimalFormat("0.00000000E00");
+  private static final String dfmt = "0.00000000E00";
+  private DecimalFormat df;
 
-  private JTextField dataField = new JTextField(11);
+  private static final int FLEN = 11;
+  private JTextField dataField;
 
   /**
    * Initialize with the Label for the value displayed, and the
    * actual initial value.
    *
-   * @param  label  A String holding the text used for the data label.
-   * @param  dval   The double used to initialize the data value.
+   * @param  label     A String holding the text used for the data label.
+   * @param  dval      The double used to initialize the data value.
+   * @param  flen      Length of text field
+   * @param  dFormat   DecimalFormat string
    */
-  public ValueViewJP(String label, double dval) {
+  public ValueViewJP(String label, double dval, int flen, String dFormat) {
     setLayout(new BorderLayout());
 
     JLabel lbl = new JLabel(label);
+    df = new DecimalFormat(dFormat);
+    dataField = new JTextField(flen);
     dataField.setText(df.format(dval));
     dataField.setHorizontalAlignment(JTextField.RIGHT);
     dataField.setEditable(false);
 
     add(lbl, "West");
     add(dataField, "East");
+  }
+
+  /**
+   * Initializes with default size and format.
+   */
+  public ValueViewJP(String label, double dval) {
+    this(label, dval, FLEN, dfmt);
   }
 
   /**

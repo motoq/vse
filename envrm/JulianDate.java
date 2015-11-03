@@ -153,4 +153,22 @@ public class JulianDate {
   public double minus(JulianDate jdb) {
     return (jdHi - jdb.getJDHi()) + (jdLo - jdb.getJDLo());
   }
+
+  public static void main(String[] args) {
+    TimeOfDay q0 = new TimeOfDay();
+    TheDate td = null;
+    TheDate td2 = null;
+    try {
+      td = new TheDate(1996, 10, 26);
+      td2 = new TheDate(2015, 8, 17);
+    } catch(BadDateException bde) {
+      System.out.println("" + bde);
+      return;
+    }
+    JulianDate jd  = new JulianDate(td,  q0);
+    JulianDate jd2 = new JulianDate(td2, q0);
+    System.out.println(td + " is " + td.getJD() + " and " + jd.getJD());
+    System.out.println(td2 + " is " + td2.getJD() + " and " + jd2.getJD());
+  }
+
 }

@@ -51,6 +51,14 @@ public class DuvDq extends Matrix {
    * the pointing vector provide useful partials info, only they are returned.
    * The first element of the transformed pointing vector is 'u' and the 2nd
    *  element is 'v'.
+   *                        <P>
+   *                                                    T
+   *                           dpdq = | du/dq0  dv/dq0 |
+   *                                  | du/dq1  dv/dq1 |
+   *                                  | du/dq2  dv/dq2 |
+   *                                  | du/dq3  dv/dq3 |
+   *                                  -                -
+   *                        </P>
    *
    * @param   xyz    Unit pointing vector to the reference point in the
    *                 inertial/computational reference frame.
@@ -58,13 +66,6 @@ public class DuvDq extends Matrix {
    * @param   q      Inertial/computational to body reference frame
    *                 transformation quaternion.  This is what the partial is
    *                 taken w.r.t.
-   *                        <P>
-   *                                  -                -
-   *                           dpdq = | du/dq0  dv/dq0 |
-   *                                  | du/dq1  dv/dq1 |
-   *                                  | du/dq2  dv/dq2 |
-   *                                  | du/dq3  dv/dq3 |
-   *                                  -                -
    */
   public void partials(Tuple3D xyz, Quaternion qbs, Quaternion q) {
       // Partial of sensor reference frame to body reference frame
