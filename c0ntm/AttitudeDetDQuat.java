@@ -165,7 +165,7 @@ public class AttitudeDetDQuat extends Quaternion
       }
       try {
         qe_vec.solve();
-        qe_vec.reset();
+        //qe_vec.reset();
       } catch(SingularMatrixException sme) {
         System.out.println("Can't decompose information matrix");
         return -1;
