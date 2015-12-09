@@ -57,9 +57,11 @@ public class AttitudeDetDQuat extends Quaternion
   public static final int NP = 3;        // Number of solve for parameters
 
   private int maxitr = 50;
-  private double tol = .0005;
+  private double tol = .00005;
 
   private AttitudeDetTRIAD attInit = new AttitudeDetTRIAD();
+  SysSolverBD qe_vec = new SysSolverBD(NY, NP);  
+  Covariance dqCov = new Covariance(NP);
 
   private int nitr = 0;
 
@@ -121,7 +123,6 @@ public class AttitudeDetDQuat extends Quaternion
 
     Matrix  w = new Matrix(NY);           // Weigthing matrix
     Tuple2D r = new Tuple2D();            // Residual
-    SysSolverBD qe_vec = new SysSolverBD(NY, NP);  
 
     Tuple2D sigmaUV = new Tuple2D();
     double sii, sjj, wii, wjj;
@@ -165,7 +166,7 @@ public class AttitudeDetDQuat extends Quaternion
       }
       try {
         qe_vec.solve();
-        //qe_vec.reset();
+        dqCov.set(qe_vec);
       } catch(SingularMatrixException sme) {
         System.out.println("Can't decompose information matrix");
         return -1;
@@ -187,6 +188,40 @@ public class AttitudeDetDQuat extends Quaternion
       nitr = -1;
     }
     return nitr;    
+  }
+
+  /**
+   * @return   A copy of the most recently generated quaternion
+   *           covariance.  4x4 Covariance, scalar as the first.
+   */
+  public Matrix covariance() {
+    Tuple3D dAlpha_dQs = new Tuple3D();
+    double alphaO2 = 0.5*axisAngle(dAlpha_dQs);
+
+    dAlpha_dQs.mult(0.5*Math.cos(alphaO2));
+ 
+    Matrix a = new Matrix(dAlpha_dQs.length(), 1);
+    Matrix aT = new Matrix(1, dAlpha_dQs.length());
+    
+    a.set(dAlpha_dQs);
+    aT.transpose(a);
+
+    Matrix w = new Matrix(dqCov);
+    w.invert();
+    Matrix wa = new Matrix(w.numRows(), a.numCols());
+    wa.mult(w, a);
+    Matrix sigAlpha = new Matrix(1);
+    sigAlpha.mult(aT, wa);
+    sigAlpha.invert();
+
+    double sigma_alpha = sigAlpha.get(1, 1);
+    double sigma_qs = 2.0*sigma_alpha/Math.sin(alphaO2);
+    
+    Matrix qCov = new Matrix(dqCov.numRows() + 1, dqCov.numCols() + 1);
+    qCov.set(2, 2, dqCov);
+    qCov.put(1, 1, sigma_qs*sigma_qs);
+
+    return new Matrix(qCov);
   }
 
     /**

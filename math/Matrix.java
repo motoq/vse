@@ -338,6 +338,36 @@ public class Matrix extends VectorSpace {
   }
 
   /**
+   * Set this matrix with the sub matrix starting at the input row and
+   * column.  Note that existing values will remain - call zero() first if
+   * original supermatrix components should be zeroed.
+   *
+   * @param   row    Row in this matrix into which values will start
+   *                 being copied
+   * @param   col    Column in this matrix into which values will start
+   *                 being copied.
+   * @param   mtrx   Matrix from which to copy values - must fit from
+   *                 start index to end of this matrix.
+   *
+   * @throws  VectorSpaceArgumentException  If the input matrix is too big
+   *                                        to fit in this matrix starting
+   *                                        at the given indices.
+   *                 
+   */
+  public void set(int row, int col, Matrix mtrx) {
+    if ((M + 1 - row) < mtrx.M  ||  (N + 1 - col) < mtrx.N) {
+      throw new VectorSpaceArgumentException("Sub Matrix must be (" +
+                 (M+1-row) + ", " + (N+1-col) + " or smaller.");
+    } else {
+      for (int ii=0; ii < mtrx.M; ii++) {
+        for (int jj=0; jj < mtrx.N; jj++) {
+          this.put(row+ii, col+jj, mtrx.get(ii+1, jj+1));
+        }
+      }
+    }
+  }
+
+  /**
    * Set values of selected column of this Matrix to those of the input
    * Tuple
    *
