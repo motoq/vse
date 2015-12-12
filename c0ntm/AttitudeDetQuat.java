@@ -180,13 +180,14 @@ public class AttitudeDetQuat extends Quaternion
         dp.solve();
         qCov.set(dp);
       } catch(SingularMatrixException sme) {
-        System.out.println("Can't decompose information matrix");
+        System.err.println("Can't decompose information matrix");
         return -1;
       }
         // Don't let the update get too big, but scale to
         // maintain direction.
       while ((dpnew = dp.mag()) > dpold) {
         dp.mult(0.5);
+        //System.err.println("Scaled Quat Updated by 0.5");
       }
       phat.plus(dp);
         // Poor man's constrained WLS...
